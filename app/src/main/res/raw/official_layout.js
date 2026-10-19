@@ -73,6 +73,19 @@
         ${ACTION_BTN} > div > div + div span { font-size: 14px !important; font-weight: 500 !important; }
         ${ACTION_ROW} > [role="presentation"] { flex: 1 1 0 !important; margin: 0 !important; min-width: 0 !important; }
         ${ACTION_ROW} > [role="button"][aria-label$="reacted"] { margin: 0 0 0 auto !important; }
+        /* Bottom navigation bar like Facebook native app */
+        [role="tablist"] {
+            position: fixed !important;
+            bottom: 0 !important;
+            top: auto !important;
+            left: 0 !important;
+            width: 100vw !important;
+            z-index: 9998 !important;
+        }
+        /* Pad feed content so it does not hide behind the bottom tab bar */
+        div[data-type="vscroller"] > div:not(.pull-to-refresh-spinner-container) {
+            padding-bottom: 60px !important;
+        }
     `;
     const style = document.createElement('style');
     style.textContent = css;

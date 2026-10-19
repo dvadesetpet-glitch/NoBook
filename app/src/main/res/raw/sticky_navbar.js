@@ -76,7 +76,8 @@
 
         if (hasFeed) Object.assign(tabbar.style, {
             position: 'fixed',
-            top: hasLogo ? navbarHeight + 'px' : '',
+            bottom: '0',
+            top: '',
             left: '0',
             width: '100%',
             zIndex: '999',
@@ -84,11 +85,16 @@
         });
 
         if (scroller) {
-            const offset = (hasLogo ? navbarHeight : 0) + (hasFeed ? tabbarHeight : 0);
+            const topOffset = hasLogo ? navbarHeight : 0;
+            const bottomOffset = hasFeed ? tabbarHeight : 0;
             const scrollContent = scroller.querySelector(':scope > div:not(.pull-to-refresh-spinner-container)');
-            scrollContent ? scrollContent.style.marginTop = offset + 'px' : scroller.style.paddingTop = offset + 'px';
-
-            if (window.isFeed()) scroller.style.paddingBottom = '0';
+            if (scrollContent) {
+                scrollContent.style.marginTop = topOffset + 'px';
+                scrollContent.style.paddingBottom = bottomOffset + 'px';
+            } else {
+                scroller.style.paddingTop = topOffset + 'px';
+                scroller.style.paddingBottom = bottomOffset + 'px';
+            }
 
             const spinnerContainer = scroller.querySelector('.pull-to-refresh-spinner-container');
             if (spinnerContainer) Object.assign(spinnerContainer.style, {
