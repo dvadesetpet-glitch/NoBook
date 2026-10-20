@@ -465,6 +465,49 @@
     });
   };
 
+  // === Inject "Download to gallery" into the feed-post three-dot action sheet ===
+  const MENU_ITEM_ID = 'nb-dl-menu-item';
+
+  const injectMenuDownload = () => {
+    // The floating download button already covers full-screen viewers.
+    if (isInStoryOrReelView()) return;
+    document.querySelectorAll('[role="dialog"]').forEach((dialog) => {
+      if (dialog.querySelector('#' + MENU_ITEM_ID)) return;
+      const items = dialog.querySelectorAll('[role="menuitem"]');
+      if (!items.length) return;
+      const blobVid = getVisibleBlobVideo();
+      const directVid = !blobVid
+        ? Array.from(document.querySelectorAll('video')).find((v) => {
+            if (!hasDirectSrc(v)) return false;
+            const r = v.getBoundingClientRect();
+            return r.width > 100 && r.height > 100;
+          })
+        : null;
+      if (!blobVid && !directVid) return;
+      const since = performance.now() - 30000;
+      const ref = items[0];
+      const rs = window.getComputedStyle(ref);
+      const item = document.createElement('div');
+      item.id = MENU_ITEM_ID;
+      item.setAttribute('role', 'menuitem');
+      item.style.cssText =
+        'display:flex;align-items:center;gap:12px;cursor:pointer;' +
+        `padding:${rs.paddingTop} ${rs.paddingRight} ${rs.paddingBottom} ${rs.paddingLeft};` +
+        `font-size:${rs.fontSize};color:${rs.color};`;
+      item.innerHTML =
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0">' +
+        '<path d="M5 20h14v-2H5v2zm7-18l-5 5h3v6h4v-6h3l-5-5z"/></svg>Download to gallery';
+      item.addEventListener('click', () => {
+        if (blobVid) downloadDash(since);
+        else downloadMedia(directVid.src);
+        history.back();
+      });
+      ref.parentElement.insertBefore(item, ref);
+    });
+  };
+
+  setInterval(injectMenuDownload, 200);
+
   // Start when document is ready
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
