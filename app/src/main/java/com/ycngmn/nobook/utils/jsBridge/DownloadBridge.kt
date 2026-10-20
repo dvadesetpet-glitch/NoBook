@@ -128,6 +128,7 @@ class DownloadBridge(private val context: Context) {
             toast(R.string.download_failed_invalid_data)
             return
         }
+        toast(R.string.downloading)
         thread(name = "nobook-download") {
             runCatching {
                 val conn = URL(url).openConnection() as HttpURLConnection
@@ -160,6 +161,7 @@ class DownloadBridge(private val context: Context) {
             toast(R.string.download_failed_invalid_data)
             return
         }
+        toast(R.string.downloading)
         thread(name = "nobook-dash") {
             val stamp = System.currentTimeMillis()
             val videoFile = File(context.cacheDir, "dash_$stamp.v.mp4")

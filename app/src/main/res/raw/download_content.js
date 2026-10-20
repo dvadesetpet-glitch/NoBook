@@ -68,12 +68,13 @@
   // Streaming (MSE) videos expose a blob: URL that cannot be fetched; only direct links work.
   const hasDirectSrc = (el) => !!el.src && !el.src.startsWith("blob:");
 
+  // Matches DASH/MSE videos: either blob: src OR srcObject (MediaSource) — no direct fbcdn link.
   const getVisibleBlobVideo = () =>
     Array.from(document.querySelectorAll("video")).find(v => {
       const r = v.getBoundingClientRect();
       const w = Math.min(r.right, window.innerWidth) - Math.max(r.left, 0);
       const h = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
-      return !hasDirectSrc(v) && v.src && r.width > 150 && r.height > 150 &&
+      return !hasDirectSrc(v) && r.width > 150 && r.height > 150 &&
         w > 0 && h > 0 && w * h > r.width * r.height * 0.6;
     });
 
@@ -344,14 +345,28 @@
     btn.setAttribute("aria-label", "Download content");
 
     btn.addEventListener("click", () => {
-      // Reset state
+      if (btn.dataset.downloading) return;
+      btn.dataset.downloading = '1';
+      btn.style.opacity = '0.4';
+      btn.style.pointerEvents = 'none';
+      // Re-enable after 30s as a safety net (native side shows its own toasts)
+      setTimeout(() => {
+        delete btn.dataset.downloading;
+        btn.style.opacity = '';
+        btn.style.pointerEvents = '';
+      }, 30000);
+
       currentContentContainer = null;
       lastDownloadedUrl = null;
 
-      // Find current media and container
       // A streaming video on screen wins over the thumbnails and avatars around it.
       const mediaElement = getCurrentMediaElement();
       if ((!mediaElement || mediaElement.tagName !== "VIDEO") && getVisibleBlobVideo()) {
+        downloadDash(navSince);
+        return;
+      }
+      // On reel/video pages, always attempt DASH even if video element wasn't detected.
+      if (!mediaElement && (/\/(reel|videos|watch)\//i.test(location.pathname) || location.search.includes('v='))) {
         downloadDash(navSince);
         return;
       }
@@ -381,6 +396,12 @@
 
       if (mediaElement) {
         currentContentContainer = findContentContainer(mediaElement);
+        btn.classList.add("visible");
+        return;
+      }
+
+      // On reel/video pages show the button even if video detection hasn't resolved yet.
+      if (/\/(reel|videos|watch)\//i.test(location.pathname) || location.search.includes('v=')) {
         btn.classList.add("visible");
         return;
       }
