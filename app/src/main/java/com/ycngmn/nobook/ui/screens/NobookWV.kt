@@ -238,6 +238,7 @@ fun NobookWebView(
             windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
             windowInsetsController.isAppearanceLightStatusBars = isLight
             windowInsetsController.isAppearanceLightNavigationBars = isLight
+            window.navigationBarColor = themeColor.toArgb()
         }
         isImmersiveMode = immersive
     }
@@ -402,6 +403,7 @@ fun NobookWebView(
                     "AdFilteringBridge"
                 )
 
+                android.webkit.WebView.setWebContentsDebuggingEnabled(true)
                 setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
                 overScrollMode = View.OVER_SCROLL_NEVER

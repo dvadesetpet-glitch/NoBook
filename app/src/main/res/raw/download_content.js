@@ -112,6 +112,12 @@
     });
   };
 
+  // Returns true when on the main feed (not inside a specific viewer).
+  const isFeed = () => {
+    const p = location.pathname;
+    return p === '/' || p === '' || p === '/home.php';
+  };
+
   // Check if we are in a story or reel view
   const isInStoryOrReelView = () => {
     // URL pattern checks
@@ -465,16 +471,33 @@
     });
   };
 
-  // === Inject "Download to gallery" into the feed-post three-dot action sheet ===
+  // === Inject "Download to gallery" into the feed-post / reel three-dot action sheet ===
   const MENU_ITEM_ID = 'nb-dl-menu-item';
 
   const injectMenuDownload = () => {
-    // The floating download button already covers full-screen viewers.
-    if (isInStoryOrReelView()) return;
-    document.querySelectorAll('[role="dialog"]').forEach((dialog) => {
+    // Cover all overlay container patterns FB uses across feed and reels
+    const seen = new Set();
+    const candidates = [
+      ...document.querySelectorAll('[role="dialog"]'),
+      ...document.querySelectorAll('[role="menu"]'),
+      ...document.querySelectorAll('[role="listbox"]'),
+    ];
+    candidates.forEach((dialog) => {
+      if (seen.has(dialog)) return;
+      seen.add(dialog);
       if (dialog.querySelector('#' + MENU_ITEM_ID)) return;
-      const items = dialog.querySelectorAll('[role="menuitem"]');
+
+      // Accept any of the item roles FB may use
+      let items = dialog.querySelectorAll('[role="menuitem"]');
+      if (!items.length) items = dialog.querySelectorAll('[role="listitem"]');
+      if (!items.length) items = dialog.querySelectorAll('[role="option"]');
+      // Fallback: role="button" items stacked in a list (share sheet / action sheet pattern)
+      if (!items.length) {
+        const btns = dialog.querySelectorAll('[role="button"]');
+        if (btns.length >= 3) items = btns;
+      }
       if (!items.length) return;
+
       const blobVid = getVisibleBlobVideo();
       const directVid = !blobVid
         ? Array.from(document.querySelectorAll('video')).find((v) => {
@@ -483,7 +506,11 @@
             return r.width > 100 && r.height > 100;
           })
         : null;
-      if (!blobVid && !directVid) return;
+      // On a reel/video URL, allow injection even if video detection fails
+      const onVideoPage = /\/(reel|videos|watch)\//i.test(location.pathname) ||
+                          location.search.includes('v=');
+      if (!blobVid && !directVid && !onVideoPage) return;
+
       const since = performance.now() - 30000;
       const ref = items[0];
       const rs = window.getComputedStyle(ref);
@@ -499,7 +526,8 @@
         '<path d="M5 20h14v-2H5v2zm7-18l-5 5h3v6h4v-6h3l-5-5z"/></svg>Download to gallery';
       item.addEventListener('click', () => {
         if (blobVid) downloadDash(since);
-        else downloadMedia(directVid.src);
+        else if (directVid) downloadMedia(directVid.src);
+        else downloadDash(since);
         history.back();
       });
       ref.parentElement.insertBefore(item, ref);

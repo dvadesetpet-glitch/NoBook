@@ -56,7 +56,12 @@
 
     const applyStyles = () => {
         const navbar = document.querySelector('div[data-tti-phase="-1"][data-mcomponent="MContainer"][data-type="container"][data-focusable="true"].m');
-        const tabbar = document.querySelector('div[role="tablist"][data-tti-phase="-1"][data-type="container"][data-mcomponent="MContainer"].m');
+        const tabbar = document.querySelector('div[role="tablist"][data-tti-phase="-1"][data-type="container"][data-mcomponent="MContainer"].m') ||
+            document.querySelector('[role="tablist"]') ||
+            (() => {
+                const t = document.querySelector('[role="tab"][aria-label^="feed"], [role="tab"][aria-label*="home" i]');
+                return t && (t.closest('[role="tablist"]') || t.closest('[data-type="container"][data-mcomponent="MContainer"]') || t.parentElement?.parentElement);
+            })();
         const scroller = document.querySelector('div[data-type="vscroller"][data-is-pull-to-refresh-allowed="true"]');
 
         const hasLogo = navbar?.querySelector('div[aria-label*="Facebook"]');
@@ -74,15 +79,15 @@
             pointerEvents: 'auto'
         });
 
-        if (hasFeed) Object.assign(tabbar.style, {
-            position: 'fixed',
-            bottom: '0',
-            top: '',
-            left: '0',
-            width: '100%',
-            zIndex: '999',
-            pointerEvents: 'auto'
-        });
+        if (hasFeed) {
+            tabbar.style.setProperty('position', 'fixed', 'important');
+            tabbar.style.setProperty('bottom', '0', 'important');
+            tabbar.style.setProperty('top', 'auto', 'important');
+            tabbar.style.setProperty('left', '0', 'important');
+            tabbar.style.setProperty('width', '100%', 'important');
+            tabbar.style.setProperty('z-index', '999', 'important');
+            tabbar.style.setProperty('pointer-events', 'auto', 'important');
+        }
 
         if (scroller) {
             const topOffset = hasLogo ? navbarHeight : 0;

@@ -2,7 +2,6 @@ package com.ycngmn.nobook.utils
 
 import java.net.URL
 import java.net.URLDecoder
-import java.net.URLEncoder
 
 fun fbRedirectSanitizer(link: String): String {
     try {
@@ -18,10 +17,7 @@ fun fbRedirectSanitizer(link: String): String {
 
         val params = url.query?.split("&")
             ?.filter { !it.startsWith("fbclid=") }
-            ?.joinToString("&") { param ->
-                val (key, value) = param.split("=", limit = 2)
-                "$key=${URLEncoder.encode(value, "UTF-8")}"
-            }
+            ?.joinToString("&")
 
         return buildString {
             append("${url.protocol}://${url.host}")

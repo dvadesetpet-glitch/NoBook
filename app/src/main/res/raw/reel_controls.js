@@ -106,6 +106,7 @@
     };
 
     const isStory = () => location.pathname.includes('/stories/');
+    const isReel  = () => location.pathname.includes('/reel/');
 
     let ui = null;
 
@@ -117,7 +118,7 @@
         ui.bar.style.display = v ? 'block' : 'none';
 
         if (!dragging) {
-            ui.bar.style.bottom = isStory() ? '56px' : '0';
+            ui.bar.style.bottom = isStory() ? '56px' : isReel() ? '56px' : '0';
         }
 
         if (!v || dragging) return;
