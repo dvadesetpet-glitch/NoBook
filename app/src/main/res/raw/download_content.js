@@ -349,12 +349,11 @@
       btn.dataset.downloading = '1';
       btn.style.opacity = '0.4';
       btn.style.pointerEvents = 'none';
-      // Re-enable after 30s as a safety net (native side shows its own toasts)
       setTimeout(() => {
         delete btn.dataset.downloading;
         btn.style.opacity = '';
         btn.style.pointerEvents = '';
-      }, 30000);
+      }, 5000);
 
       currentContentContainer = null;
       lastDownloadedUrl = null;
@@ -532,7 +531,6 @@
                           location.search.includes('v=');
       if (!blobVid && !directVid && !onVideoPage) return;
 
-      const since = performance.now() - 30000;
       const ref = items[0];
       const rs = window.getComputedStyle(ref);
       const item = document.createElement('div');
@@ -546,9 +544,17 @@
         '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0">' +
         '<path d="M5 20h14v-2H5v2zm7-18l-5 5h3v6h4v-6h3l-5-5z"/></svg>Download to gallery';
       item.addEventListener('click', () => {
-        if (blobVid) downloadDash(since);
-        else if (directVid) downloadMedia(directVid.src);
-        else downloadDash(since);
+        const blobVidNow = getVisibleBlobVideo();
+        const directVidNow = !blobVidNow
+          ? Array.from(document.querySelectorAll('video')).find((v) => {
+              if (!hasDirectSrc(v)) return false;
+              const r = v.getBoundingClientRect();
+              return r.width > 100 && r.height > 100;
+            })
+          : null;
+        if (blobVidNow) downloadDash(navSince);
+        else if (directVidNow) downloadMedia(directVidNow.src);
+        else downloadDash(navSince);
         history.back();
       });
       ref.parentElement.insertBefore(item, ref);
