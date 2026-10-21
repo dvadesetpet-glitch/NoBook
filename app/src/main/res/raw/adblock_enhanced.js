@@ -31,7 +31,13 @@
                 nodes.forEach(el => {
                     if (el.dataset.nbBlocked === '1') return;
                     el.dataset.nbBlocked = '1';
-                    el.style.display = 'none';
+                    const snappable = el.closest('div.vertically-snappable');
+                    if (snappable && !snappable.dataset.adHidden) {
+                        snappable.dataset.adHidden = '1';
+                        snappable.remove();
+                    } else {
+                        el.style.display = 'none';
+                    }
                     count++;
                 });
             }
