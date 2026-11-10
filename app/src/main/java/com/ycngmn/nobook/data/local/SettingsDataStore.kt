@@ -42,7 +42,7 @@ class SettingsDataStore(private val context: Context) {
         context.dataStore.edit { it[REMOVE_ADS] = removeAds }
     }
 
-    val enableDownloadContent = context.dataStore.data.map { it[ENABLE_DOWNLOAD_CONTENT] ?: false }
+    val enableDownloadContent = context.dataStore.data.map { it[ENABLE_DOWNLOAD_CONTENT] ?: true }
     suspend fun setEnableDownloadContent(enableDownloadContent: Boolean) {
         context.dataStore.edit { it[ENABLE_DOWNLOAD_CONTENT] = enableDownloadContent }
     }

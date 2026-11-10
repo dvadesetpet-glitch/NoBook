@@ -49,7 +49,7 @@ class SettingsViewModel(
     )
     val enableDownloadContent = dataStore.enableDownloadContent.stateIn(
         scope = viewModelScope,
-        initialValue = initialPrefs[ENABLE_DOWNLOAD_CONTENT] ?: false,
+        initialValue = initialPrefs[ENABLE_DOWNLOAD_CONTENT] ?: true,
         started = SharingStarted.WhileSubscribed()
     )
     val enableCopyToClipboard = dataStore.enableCopyToClipboard.stateIn(
