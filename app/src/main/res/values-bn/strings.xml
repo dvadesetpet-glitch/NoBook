@@ -32,4 +32,13 @@
     <string name="hide_sponsored_ads_from_your_feed">ফিড থেকে স্পন্সরড বিজ্ঞাপন লুকান</string>
     <string name="enable_download_button_on_media_view">মিডিয়া ভিউতে ডাউনলোড বোতাম চালু করুন</string>
     <string name="nobook_settings">Nobook সেটিংস</string>
+    <string name="reel_autoplay_title">রিলস অটোপ্লে</string>
+    <string name="reel_autoplay_summary">রিলস খোলার সাথে সাথে স্বয়ংক্রিয়ভাবে চালু করুন</string>
+    <string name="story_autoplay_title">স্টোরিজ অটোপ্লে</string>
+    <string name="story_autoplay_summary">স্টোরির ভিডিও খোলার সাথে সাথে স্বয়ংক্রিয়ভাবে চালু করুন</string>
+    <string name="copy_to_clipboard_title">ক্লিপবোর্ডে কপি করুন</string>
+    <string name="link_copied_to_clipboard">লিংক ক্লিপবোর্ডে কপি হয়েছে</string>
+    <string name="failed_to_copy_link">লিংক কপি করা ব্যর্থ</string>
+    <string name="enable_copy_to_clipboard_button_on_media_view">মিডিয়া ভিউতে ক্লিপবোর্ডে কপি বোতাম চালু করুন</string>
+    <string name="not_supported">সমর্থিত নয়</string>
 </resources>

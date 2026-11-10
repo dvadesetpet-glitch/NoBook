@@ -36,4 +36,9 @@
     <string name="enable_download_button_on_media_view">Activar botón de descarga en vista de medios</string>
     <string name="enable_copy_to_clipboard_button_on_media_view">Activar botón de copiar al portapapeles en vista de medios</string>
     <string name="nobook_settings">Configuración de Nobook</string>
+    <string name="reel_autoplay_title">Reproducción automática de Reels</string>
+    <string name="reel_autoplay_summary">Iniciar los reels automáticamente al abrirlos</string>
+    <string name="story_autoplay_title">Reproducción automática de Stories</string>
+    <string name="story_autoplay_summary">Iniciar los videos de las stories automáticamente al abrirlos</string>
+    <string name="not_supported">No compatible</string>
 </resources>

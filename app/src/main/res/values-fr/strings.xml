@@ -32,4 +32,13 @@
     <string name="hide_sponsored_ads_from_your_feed">Masquer les publicités sponsorisées dans le flux</string>
     <string name="enable_download_button_on_media_view">Activer le bouton de téléchargement sur la vue média</string>
     <string name="nobook_settings">Paramètres Nobook</string>
+    <string name="reel_autoplay_title">Lecture automatique des Reels</string>
+    <string name="reel_autoplay_summary">Lancer les reels automatiquement à l\'ouverture</string>
+    <string name="story_autoplay_title">Lecture automatique des Stories</string>
+    <string name="story_autoplay_summary">Lancer les vidéos des stories automatiquement à l\'ouverture</string>
+    <string name="copy_to_clipboard_title">Copier dans le presse-papiers</string>
+    <string name="link_copied_to_clipboard">Lien copié dans le presse-papiers</string>
+    <string name="failed_to_copy_link">Échec de la copie du lien</string>
+    <string name="enable_copy_to_clipboard_button_on_media_view">Activer le bouton de copie dans le presse-papiers sur la vue média</string>
+    <string name="not_supported">Non pris en charge</string>
 </resources>

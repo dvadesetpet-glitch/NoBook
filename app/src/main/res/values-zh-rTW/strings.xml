@@ -32,4 +32,13 @@
     <string name="hide_sponsored_ads_from_your_feed">隱藏動態中的廣告</string>
     <string name="enable_download_button_on_media_view">在媒體檢視中啟用下載按鈕</string>
     <string name="nobook_settings">Nobook 設定</string>
+    <string name="reel_autoplay_title">Reels 自動播放</string>
+    <string name="reel_autoplay_summary">開啟時自動播放 Reels</string>
+    <string name="story_autoplay_title">限時動態自動播放</string>
+    <string name="story_autoplay_summary">開啟時自動播放限時動態影片</string>
+    <string name="copy_to_clipboard_title">複製到剪貼簿</string>
+    <string name="link_copied_to_clipboard">已將連結複製到剪貼簿</string>
+    <string name="failed_to_copy_link">無法複製連結</string>
+    <string name="enable_copy_to_clipboard_button_on_media_view">在媒體檢視中啟用複製到剪貼簿按鈕</string>
+    <string name="not_supported">不支援</string>
 </resources>

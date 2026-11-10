@@ -32,4 +32,13 @@
     <string name="hide_sponsored_ads_from_your_feed">Gesponserte Werbung im Feed ausblenden</string>
     <string name="enable_download_button_on_media_view">Download-Button in Medienansicht aktivieren</string>
     <string name="nobook_settings">Nobook-Einstellungen</string>
+    <string name="reel_autoplay_title">Reels automatisch abspielen</string>
+    <string name="reel_autoplay_summary">Reels beim Öffnen automatisch starten</string>
+    <string name="story_autoplay_title">Stories automatisch abspielen</string>
+    <string name="story_autoplay_summary">Story-Videos beim Öffnen automatisch starten</string>
+    <string name="copy_to_clipboard_title">In Zwischenablage kopieren</string>
+    <string name="link_copied_to_clipboard">Link in die Zwischenablage kopiert</string>
+    <string name="failed_to_copy_link">Link konnte nicht kopiert werden</string>
+    <string name="enable_copy_to_clipboard_button_on_media_view">Button zum Kopieren in die Zwischenablage in Medienansicht aktivieren</string>
+    <string name="not_supported">Nicht unterstützt</string>
 </resources>
