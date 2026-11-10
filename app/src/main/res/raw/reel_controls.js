@@ -23,20 +23,23 @@
     let dragging = false;
 
     const build = () => {
-        // Outer div is the 24px touch target (transparent background).
+        // Outer div is the 24px touch target (transparent background), flush with the bottom of
+        // the screen. The 8px side inset is just enough for the 14px thumb to stay on screen at
+        // 0% and 100%.
         const bar = document.createElement('div');
         bar.id = BAR_ID;
         bar.setAttribute('style', [
-            'position:fixed', 'left:0', 'right:0', 'bottom:0',
+            'position:fixed', 'left:8px', 'right:8px', 'bottom:0',
             'z-index:2147483647', 'display:none',
             'height:24px', 'background:transparent',
             'cursor:pointer', 'touch-action:none'
         ].join(';'));
 
-        // Visual track (dim white strip).
+        // Visual track (dim white strip), as low as it can go while the thumb (centred on it)
+        // still ends exactly at the screen edge.
         const track = document.createElement('div');
         track.setAttribute('style', [
-            'position:absolute', 'left:0', 'right:0', 'bottom:8px',
+            'position:absolute', 'left:0', 'right:0', 'bottom:5px',
             'height:4px', 'background:rgba(255,255,255,0.3)',
             'pointer-events:none'
         ].join(';'));
@@ -44,7 +47,7 @@
         // Filled portion showing progress.
         const barFill = document.createElement('div');
         barFill.setAttribute('style', [
-            'position:absolute', 'left:0', 'bottom:8px',
+            'position:absolute', 'left:0', 'bottom:5px',
             'height:4px', 'width:0%', 'background:rgba(255,255,255,0.9)',
             'transition:width 0.25s linear', 'pointer-events:none'
         ].join(';'));
@@ -52,7 +55,7 @@
         // Thumb: white circle at current position.
         const thumb = document.createElement('div');
         thumb.setAttribute('style', [
-            'position:absolute', 'bottom:3px', 'left:0%',
+            'position:absolute', 'bottom:0', 'left:0%',
             'width:14px', 'height:14px', 'background:white',
             'border-radius:50%', 'transform:translateX(-50%)',
             'box-shadow:0 1px 4px rgba(0,0,0,0.5)',
@@ -105,9 +108,6 @@
         return { bar, barFill, thumb };
     };
 
-    const isStory = () => location.pathname.includes('/stories/');
-    const isReel  = () => location.pathname.includes('/reel/');
-
     let ui = null;
 
     const tick = () => {
@@ -116,10 +116,6 @@
 
         const v = currentVideo();
         ui.bar.style.display = v ? 'block' : 'none';
-
-        if (!dragging) {
-            ui.bar.style.bottom = isStory() ? '56px' : isReel() ? '56px' : '0';
-        }
 
         if (!v || dragging) return;
 
