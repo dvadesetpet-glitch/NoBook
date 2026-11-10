@@ -35,6 +35,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
@@ -311,6 +314,28 @@ fun NobookWebView(
                 webView.destroy()
             }
         }
+    }
+
+    // Stop sound when the app goes to the background: pause every video/audio on the page and
+    // pause the WebView. On return the WebView resumes but media stays paused until tapped.
+    val lifecycle = (activity as? LifecycleOwner)?.lifecycle
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            val webView = state.nativeWebView ?: return@LifecycleEventObserver
+            when (event) {
+                Lifecycle.Event.ON_STOP -> {
+                    webView.evaluateJavascript(
+                        "document.querySelectorAll('video,audio').forEach(m=>{try{m.pause()}catch(e){}})",
+                        null
+                    )
+                    webView.onPause()
+                }
+                Lifecycle.Event.ON_START -> webView.onResume()
+                else -> {}
+            }
+        }
+        lifecycle?.addObserver(observer)
+        onDispose { lifecycle?.removeObserver(observer) }
     }
 
     WebView(
