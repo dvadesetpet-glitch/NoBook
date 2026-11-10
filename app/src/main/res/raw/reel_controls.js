@@ -126,4 +126,65 @@
     };
 
     setInterval(tick, 250);
+
+    // Keep the same reel when the screen rotates. On a resize Facebook redraws the reels page
+    // with a fresh set of reels, so remember the video_id of the reel on screen and, if a
+    // different one is showing after the rotation, open the remembered one by its URL.
+    const LIST = '.vscroller-snap';
+    const ITEM = ':scope > .vertically-snappable';
+    const ids = new WeakMap();   // reel element -> video_id (read once per element)
+    let shownId = null;
+    let resizedAt = 0;
+
+    const onReelsPage = () => location.pathname.startsWith('/reel');
+
+    const reelIdOnScreen = () => {
+        const list = document.querySelector(LIST);
+        if (!list) return null;
+        const top = list.getBoundingClientRect().top;
+        let item = null, bestDist = Infinity;
+        list.querySelectorAll(ITEM).forEach((el) => {
+            const d = Math.abs(el.getBoundingClientRect().top - top);
+            if (d < bestDist) { bestDist = d; item = el; }
+        });
+        if (!item) return null;
+        if (!ids.has(item)) {
+            // The reel's data sits in attributes as JSON, so quotes appear as &quot; in outerHTML.
+            const m = item.outerHTML.match(/video_id(?:&quot;|")\s*:\s*(?:&quot;|")(\d+)/);
+            if (!m) return null;
+            ids.set(item, m[1]);
+        }
+        return ids.get(item);
+    };
+
+    setInterval(() => {
+        // Positions are in flux right after a resize; keep the reel from before it.
+        if (!onReelsPage() || Date.now() - resizedAt < 2500) return;
+        shownId = reelIdOnScreen() || shownId;
+    }, 300);
+
+    // Facebook removes the list ~1s after the resize and builds the new one ~2-3s later, so wait
+    // for the new list (up to 10s) before comparing.
+    let watcher = null;
+    window.addEventListener('resize', () => {
+        if (!onReelsPage() || !shownId) return;
+        resizedAt = Date.now();
+        if (watcher) return;           // rotation fires several resize events
+        const wanted = shownId;
+        const start = Date.now();
+        let listGone = false;
+        watcher = setInterval(() => {
+            const elapsed = Date.now() - start;
+            const now = reelIdOnScreen();
+            if (!now) listGone = true;
+            const settled = now && (listGone || elapsed > 2000);
+            if (settled || elapsed > 10000) {
+                clearInterval(watcher);
+                watcher = null;
+                if (now && now !== wanted && onReelsPage()) {
+                    location.href = 'https://www.facebook.com/reel/' + wanted;
+                }
+            }
+        }, 250);
+    });
 })();
