@@ -15,6 +15,9 @@
     <string name="saved_to_downloads">In Downloads gespeichert</string>
     <string name="download_failed_invalid_data">Download fehlgeschlagen: Ungültige Daten</string>
     <string name="failed_to_save_file">Datei konnte nicht gespeichert werden</string>
+    <string name="downloading">Wird heruntergeladen…</string>
+    <string name="storage_permission_needed">Speicherzugriff erlauben, um Downloads zu speichern, dann erneut auf Download tippen.</string>
+    <string name="download_failed_video_not_found">Video nicht gefunden. Kurz abspielen lassen und dann erneut versuchen.</string>
     <string name="suggested_posts">Vorgeschlagene Beiträge</string>
     <string name="reels">Reels</string>
     <string name="stories">Stories</string>

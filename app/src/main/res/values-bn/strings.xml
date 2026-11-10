@@ -15,6 +15,9 @@
     <string name="saved_to_downloads">ডাউনলোডে সংরক্ষিত</string>
     <string name="download_failed_invalid_data">ডাউনলোড ব্যর্থ: অবৈধ ডেটা</string>
     <string name="failed_to_save_file">ফাইল সংরক্ষণ ব্যর্থ</string>
+    <string name="downloading">ডাউনলোড হচ্ছে…</string>
+    <string name="storage_permission_needed">ডাউনলোড সংরক্ষণ করতে স্টোরেজ অ্যাক্সেসের অনুমতি দিন, তারপর আবার ডাউনলোডে ট্যাপ করুন।</string>
+    <string name="download_failed_video_not_found">এই ভিডিওটি খুঁজে পাওয়া যায়নি। কিছুক্ষণ চলতে দিন, তারপর আবার চেষ্টা করুন।</string>
     <string name="suggested_posts">প্রস্তাবিত পোস্ট</string>
     <string name="reels">রিলস</string>
     <string name="stories">স্টোরিজ</string>

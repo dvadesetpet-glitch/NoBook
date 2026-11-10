@@ -15,6 +15,9 @@
     <string name="saved_to_downloads">Enregistré dans Téléchargements</string>
     <string name="download_failed_invalid_data">Échec du téléchargement : données invalides</string>
     <string name="failed_to_save_file">Échec de l\'enregistrement du fichier</string>
+    <string name="downloading">Téléchargement…</string>
+    <string name="storage_permission_needed">Autorisez l\'accès au stockage pour enregistrer les téléchargements, puis appuyez à nouveau sur télécharger.</string>
+    <string name="download_failed_video_not_found">Vidéo introuvable. Laissez-la se lire un instant, puis réessayez.</string>
     <string name="suggested_posts">Publications suggérées</string>
     <string name="reels">Reels</string>
     <string name="stories">Stories</string>

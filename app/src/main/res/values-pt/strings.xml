@@ -15,6 +15,9 @@
     <string name="saved_to_downloads">Salvo em Downloads</string>
     <string name="download_failed_invalid_data">Falha no download: dados inválidos</string>
     <string name="failed_to_save_file">Falha ao salvar arquivo</string>
+    <string name="downloading">Baixando…</string>
+    <string name="storage_permission_needed">Permita o acesso ao armazenamento para salvar downloads e toque em baixar novamente.</string>
+    <string name="download_failed_video_not_found">Não foi possível encontrar este vídeo. Deixe-o reproduzir por um momento e tente novamente.</string>
     <string name="suggested_posts">Postagens sugeridas</string>
     <string name="reels">Reels</string>
     <string name="stories">Stories</string>

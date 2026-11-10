@@ -15,6 +15,9 @@
     <string name="saved_to_downloads">已儲存至下載</string>
     <string name="download_failed_invalid_data">下載失敗：資料無效</string>
     <string name="failed_to_save_file">儲存檔案失敗</string>
+    <string name="downloading">下載中…</string>
+    <string name="storage_permission_needed">請允許存取儲存空間以儲存下載內容，然後再點一次下載。</string>
+    <string name="download_failed_video_not_found">找不到此影片。請讓它播放一下，然後再試一次。</string>
     <string name="suggested_posts">推薦貼文</string>
     <string name="reels">Reels</string>
     <string name="stories">限時動態</string>

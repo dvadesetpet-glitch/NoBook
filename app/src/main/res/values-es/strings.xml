@@ -16,6 +16,9 @@
     <string name="saved_to_downloads">Guardado en Descargas</string>
     <string name="download_failed_invalid_data">Descarga fallida: datos inválidos</string>
     <string name="failed_to_save_file">Error al guardar el archivo</string>
+    <string name="downloading">Descargando…</string>
+    <string name="storage_permission_needed">Permite el acceso al almacenamiento para guardar descargas y vuelve a tocar descargar.</string>
+    <string name="download_failed_video_not_found">No se encontró este video. Déjalo reproducirse un momento y vuelve a intentarlo.</string>
     <string name="link_copied_to_clipboard">Enlace copiado al portapapeles</string>
     <string name="failed_to_copy_link">Error al copiar el enlace</string>
     <string name="suggested_posts">Publicaciones sugeridas</string>

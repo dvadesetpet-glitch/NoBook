@@ -15,6 +15,9 @@
     <string name="saved_to_downloads">تم الحفظ في التنزيلات</string>
     <string name="download_failed_invalid_data">فشل التنزيل: بيانات غير صالحة</string>
     <string name="failed_to_save_file">فشل حفظ الملف</string>
+    <string name="downloading">جارٍ التنزيل…</string>
+    <string name="storage_permission_needed">اسمح بالوصول إلى التخزين لحفظ التنزيلات، ثم اضغط على التنزيل مرة أخرى.</string>
+    <string name="download_failed_video_not_found">تعذّر العثور على هذا الفيديو. اتركه يعمل للحظة، ثم حاول مرة أخرى.</string>
     <string name="suggested_posts">المنشورات المقترحة</string>
     <string name="reels">ريلز</string>
     <string name="stories">قصص</string>
