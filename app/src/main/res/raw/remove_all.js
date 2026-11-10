@@ -30,6 +30,16 @@
 
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+    // Wait until Facebook takes the card away (button removed or hidden), at most `max` ms.
+    // Never slower than the old fixed pause, and much faster when the card goes right away.
+    const waitGone = async (el, max) => {
+        const start = Date.now();
+        while (Date.now() - start < max) {
+            if (!el.isConnected || el.offsetParent === null) return;
+            await sleep(50);
+        }
+    };
+
     let running = false;
     let armedTimer = null;
     let btn = null;
@@ -40,22 +50,24 @@
         running = true;
         let done = 0;
         let idleRounds = 0;
-        while (running && done < MAX_PER_RUN && idleRounds < 4) {
+        while (running && done < MAX_PER_RUN && idleRounds < 5) {
             const next = removeButtons()[0];
             if (!next) {
+                // Scroll to make Facebook load more suggestions.
                 idleRounds++;
                 window.scrollBy(0, window.innerHeight);
-                await sleep(1200);
+                await sleep(700);
                 continue;
             }
             idleRounds = 0;
             next.dataset.nbRemoved = '1';
             next.scrollIntoView({ block: 'center' });
-            await sleep(250);
             next.click();
             done++;
             label('Stop (' + done + ')');
-            await sleep(700 + Math.random() * 600);
+            await waitGone(next, 1000);
+            // Short random pause so the clicks don't look machine-timed to Facebook.
+            await sleep(150 + Math.random() * 200);
         }
         running = false;
         label('Removed ' + done);
