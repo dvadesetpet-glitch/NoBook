@@ -321,7 +321,10 @@ fun NobookWebView(
     val lifecycle = (activity as? LifecycleOwner)?.lifecycle
     DisposableEffect(lifecycle) {
         val observer = LifecycleEventObserver { _, event ->
-            val webView = state.nativeWebView ?: return@LifecycleEventObserver
+            // nativeWebView throws until the WebView exists, and ON_START is delivered as soon
+            // as the observer is added (before the WebView is created) — skip it then.
+            val webView = runCatching { state.nativeWebView }.getOrNull()
+                ?: return@LifecycleEventObserver
             when (event) {
                 Lifecycle.Event.ON_STOP -> {
                     webView.evaluateJavascript(
