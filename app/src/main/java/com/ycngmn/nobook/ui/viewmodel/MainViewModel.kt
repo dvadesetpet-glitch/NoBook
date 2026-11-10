@@ -74,6 +74,7 @@ class MainViewModel(
             Script(true, R.raw.autoplay, "autoplay.js", fetchRemote = false),
             Script(true, R.raw.round_badges, "round_badges.js", fetchRemote = false),
             Script(!settings.hideReels.value, R.raw.reel_controls, "reel_controls.js", fetchRemote = false),
+            Script(true, R.raw.story_reactions, "story_reactions.js", fetchRemote = false),
             Script(settings.hideStories.value, R.raw.hide_stories, "hide_stories.js"),
             Script(settings.hidePeopleYouMayKnow.value, R.raw.hide_pymk, "hide_pymk.js"),
             Script(settings.hideGroups.value, R.raw.hide_groups, "hide_groups.js")
