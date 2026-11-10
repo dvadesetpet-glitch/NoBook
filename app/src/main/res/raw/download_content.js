@@ -295,12 +295,15 @@
     return { video: video.url, audio: audio ? audio.url : "" };
   };
 
+  // Returns false (after telling the user) when the video's tracks can't be found.
   const downloadDash = (since) => {
+    if (!window.DownloadBridge) return false;
     const t = dashTracks(since);
-    if (t && window.DownloadBridge && window.DownloadBridge.downloadDash) {
+    if (t && window.DownloadBridge.downloadDash) {
       window.DownloadBridge.downloadDash(t.video, t.audio);
       return true;
     }
+    if (window.DownloadBridge.videoNotFound) window.DownloadBridge.videoNotFound();
     return false;
   };
 
@@ -349,24 +352,36 @@
       btn.dataset.downloading = '1';
       btn.style.opacity = '0.4';
       btn.style.pointerEvents = 'none';
-      setTimeout(() => {
+      // Stay locked while the app reports a running download (checked every 500ms, at least 1s,
+      // at most 5 min). Older app builds without isDownloading() fall back to a 5s lock.
+      let poll = null;
+      const unlock = () => {
+        clearInterval(poll);
         delete btn.dataset.downloading;
         btn.style.opacity = '';
         btn.style.pointerEvents = '';
-      }, 5000);
+      };
+      let waited = 0;
+      poll = setInterval(() => {
+        waited += 500;
+        const bridge = window.DownloadBridge;
+        const busy = bridge && bridge.isDownloading ? bridge.isDownloading() : waited < 5000;
+        if ((waited >= 1000 && !busy) || waited >= 300000) unlock();
+      }, 500);
 
       currentContentContainer = null;
       lastDownloadedUrl = null;
 
       // A streaming video on screen wins over the thumbnails and avatars around it.
+      // Nothing was started if the tracks weren't found, so unlock the button right away.
       const mediaElement = getCurrentMediaElement();
       if ((!mediaElement || mediaElement.tagName !== "VIDEO") && getVisibleBlobVideo()) {
-        downloadDash(navSince);
+        if (!downloadDash(navSince)) unlock();
         return;
       }
       // On reel/video pages, always attempt DASH even if video element wasn't detected.
       if (!mediaElement && (/\/(reel|videos|watch)\//i.test(location.pathname) || location.search.includes('v='))) {
-        downloadDash(navSince);
+        if (!downloadDash(navSince)) unlock();
         return;
       }
       if (mediaElement) {

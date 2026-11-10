@@ -1,7 +1,11 @@
 package com.ycngmn.nobook.utils.jsBridge
 
+import android.Manifest
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
+import android.content.ContextWrapper
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaCodec
@@ -18,6 +22,8 @@ import android.util.Base64
 import android.webkit.JavascriptInterface
 import android.webkit.MimeTypeMap
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.ycngmn.nobook.R
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -27,8 +33,22 @@ import java.net.URL
 import kotlin.concurrent.thread
 
 class DownloadBridge(private val context: Context) {
+    private companion object {
+        // Sent on every native media request so fbcdn treats them like the browser's own.
+        const val USER_AGENT =
+            "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 Chrome/154 Mobile Safari/537.36"
+    }
+
+    // URLs of downloads still running, so a second tap doesn't start a duplicate.
+    private val inFlight = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+
+    /** Lets the page keep its download button locked until every running download finishes. */
+    @JavascriptInterface
+    fun isDownloading(): Boolean = inFlight.isNotEmpty()
+
     @JavascriptInterface
     fun downloadBase64File(base64Data: String, mimeType: String) {
+        if (!hasStoragePermission()) return
         runCatching {
             if (!base64Data.contains(",")) {
                 Toast.makeText(
@@ -128,13 +148,18 @@ class DownloadBridge(private val context: Context) {
             toast(R.string.download_failed_invalid_data)
             return
         }
+        if (!hasStoragePermission()) return
+        if (!inFlight.add(url)) {
+            toast(R.string.downloading)
+            return
+        }
         toast(R.string.downloading)
         thread(name = "nobook-download") {
             runCatching {
                 val conn = URL(url).openConnection() as HttpURLConnection
                 conn.connectTimeout = 15_000
                 conn.readTimeout = 30_000
-                conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 16) AppleWebKit/537.36 Chrome/154 Mobile Safari/537.36")
+                conn.setRequestProperty("User-Agent", USER_AGENT)
                 try {
                     if (conn.responseCode !in 200..299) error("HTTP ${conn.responseCode}")
                     val mime = conn.contentType?.substringBefore(';')?.trim().orEmpty()
@@ -148,6 +173,7 @@ class DownloadBridge(private val context: Context) {
                 }
                 toast(R.string.saved_to_downloads)
             }.onFailure { toast(R.string.failed_to_save_file) }
+            inFlight.remove(url)
         }
     }
 
@@ -159,6 +185,11 @@ class DownloadBridge(private val context: Context) {
     fun downloadDash(videoUrl: String, audioUrl: String) {
         if (!videoUrl.startsWith("https://")) {
             toast(R.string.download_failed_invalid_data)
+            return
+        }
+        if (!hasStoragePermission()) return
+        if (!inFlight.add(videoUrl)) {
+            toast(R.string.downloading)
             return
         }
         toast(R.string.downloading)
@@ -178,13 +209,21 @@ class DownloadBridge(private val context: Context) {
                 toast(R.string.saved_to_downloads)
             }.onFailure { toast(R.string.failed_to_save_file) }
             videoFile.delete(); audioFile.delete(); outFile.delete()
+            inFlight.remove(videoUrl)
         }
+    }
+
+    /** Called by JS when it couldn't find the streaming tracks for the video on screen. */
+    @JavascriptInterface
+    fun videoNotFound() {
+        toast(R.string.download_failed_video_not_found)
     }
 
     private fun fetchTo(url: String, target: File) {
         val conn = URL(url).openConnection() as HttpURLConnection
         conn.connectTimeout = 15_000
         conn.readTimeout = 30_000
+        conn.setRequestProperty("User-Agent", USER_AGENT)
         try {
             if (conn.responseCode !in 200..299) error("HTTP ${conn.responseCode}")
             conn.inputStream.use { input -> FileOutputStream(target).use { input.copyTo(it) } }
@@ -240,6 +279,27 @@ class DownloadBridge(private val context: Context) {
             runCatching { muxer.release() }
             sources.forEach { it.release() }
         }
+    }
+
+    /**
+     * Android 9 and older need the storage permission to write to the public Downloads folder.
+     * If it's missing, ask for it and tell the user to tap download again once it's granted.
+     */
+    private fun hasStoragePermission(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) return true
+        val permission = Manifest.permission.WRITE_EXTERNAL_STORAGE
+        if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+            return true
+        }
+        var ctx: Context? = context
+        while (ctx is ContextWrapper && ctx !is Activity) ctx = ctx.baseContext
+        (ctx as? Activity)?.let { activity ->
+            Handler(Looper.getMainLooper()).post {
+                ActivityCompat.requestPermissions(activity, arrayOf(permission), 0)
+            }
+        }
+        toast(R.string.storage_permission_needed)
+        return false
     }
 
     private fun toast(resId: Int) {

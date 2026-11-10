@@ -20,6 +20,8 @@
     <string name="downloading">Downloading…</string>
     <string name="saved_to_downloads">Saved to Downloads</string>
     <string name="download_failed_invalid_data">Download failed: Invalid data</string>
+    <string name="storage_permission_needed">Allow storage access to save downloads, then tap download again.</string>
+    <string name="download_failed_video_not_found">Couldn\'t find this video. Let it play for a moment, then try again.</string>
     <string name="failed_to_save_file">Failed to save file</string>
     <string name="link_copied_to_clipboard">Link copied to clipboard</string>
     <string name="failed_to_copy_link">Failed to copy link</string>
