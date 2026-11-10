@@ -40,7 +40,9 @@ class DownloadBridge(private val context: Context) {
     }
 
     // URLs of downloads still running, so a second tap doesn't start a duplicate.
-    private val inFlight = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+    // (ConcurrentHashMap.newKeySet() needs API 24; minSdk is 23.)
+    private val inFlight: MutableSet<String> =
+        java.util.Collections.newSetFromMap(java.util.concurrent.ConcurrentHashMap())
 
     /** Lets the page keep its download button locked until every running download finishes. */
     @JavascriptInterface
