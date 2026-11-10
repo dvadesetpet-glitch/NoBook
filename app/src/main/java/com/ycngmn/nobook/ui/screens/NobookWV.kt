@@ -7,17 +7,11 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -29,14 +23,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
-import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import androidx.core.net.toUri
 import androidx.core.view.WindowInsetsCompat
@@ -103,12 +95,14 @@ fun NobookWebView(
     // Messenger only works in the desktop layout, so the user agent follows the page being opened.
     val desktopSetting by rememberUpdatedState(settingsVM.desktopLayout.collectAsState().value)
     var appliedUserAgent by remember { mutableStateOf<String?>(null) }
-    fun applyUserAgent(forUrl: String?) {
+    /** Returns true when it switched from one user agent to another (not on the first set). */
+    fun applyUserAgent(forUrl: String?): Boolean {
         val ua = if (desktopSetting || MessengerLinks.needsDesktopSite(forUrl)) DESKTOP_USER_AGENT else ""
-        if (ua != appliedUserAgent) {
-            state.nativeWebView.settings.userAgentString = ua
-            appliedUserAgent = ua
-        }
+        if (ua == appliedUserAgent) return false
+        val switched = appliedUserAgent != null
+        state.nativeWebView.settings.userAgentString = ua
+        appliedUserAgent = ua
+        return switched
     }
 
     val navigator = rememberWebViewNavigator(
@@ -416,20 +410,6 @@ fun NobookWebView(
             }
         }
     )
-
-    if (MessengerLinks.needsDesktopSite(state.lastLoadedUrl)) {
-        Box(Modifier.fillMaxSize()) {
-            IconButton(
-                onClick = { leaveMessenger() },
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(top = barsInsets.calculateTopPadding() + 8.dp, start = 8.dp)
-                    .background(Color(0xB3000000), CircleShape)
-            ) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
-            }
-        }
-    }
 
     if (showAccountManagement) {
         AccountManagementScreen(
