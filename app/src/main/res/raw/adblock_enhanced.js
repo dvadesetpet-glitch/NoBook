@@ -32,9 +32,12 @@
                     if (el.dataset.nbBlocked === '1') return;
                     el.dataset.nbBlocked = '1';
                     const snappable = el.closest('div.vertically-snappable');
-                    if (snappable && !snappable.dataset.adHidden) {
-                        snappable.dataset.adHidden = '1';
-                        snappable.remove();
+                    if (snappable) {
+                        // Marked only, never removed: adblock.js hides it and scrolls past it.
+                        if (!snappable.dataset.adHidden) {
+                            snappable.dataset.adHidden = '1';
+                            snappable.querySelectorAll('video').forEach(v => { v.muted = true; v.pause(); });
+                        }
                     } else {
                         el.style.display = 'none';
                     }

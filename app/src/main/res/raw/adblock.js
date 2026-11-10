@@ -53,6 +53,20 @@
 
     const specialChar = '󰞋';
 
+    // Reel ads are never taken out of the reels list: Facebook keeps its own count of the reels in
+    // it, and once nodes go missing it rebuilds the whole list and jumps to another reel mid-play.
+    // An ad reel is only marked; CSS hides it and skipAdReels() scrolls past it when it comes up.
+    function hideReel(s) {
+        if (s.dataset.adHidden) return;
+        s.dataset.adHidden = 'true';
+        s.querySelectorAll('video').forEach(v => { v.muted = true; v.pause(); });
+    }
+
+    const style = document.createElement('style');
+    style.textContent = 'div.vertically-snappable[data-ad-hidden] > *{visibility:hidden!important}' +
+        'div.vertically-snappable[data-ad-hidden]{background:#000!important}';
+    document.head.appendChild(style);
+
     const sponsoredRegex = new RegExp(`(${sponsoredTexts.join('|')})\\s*${specialChar}`, 'i');
 
     function hideSponsoredContent(config) {
@@ -64,9 +78,8 @@
             for (const span of spans) {
                 if (sponsoredRegex.test(span.textContent)) {
                     const snappable = container.closest('div.vertically-snappable');
-                    if (snappable && !snappable.dataset.adHidden) {
-                        snappable.dataset.adHidden = 'true';
-                        snappable.remove();
+                    if (snappable) {
+                        hideReel(snappable);
                     } else {
                         container.style.display = 'none';
                     }
@@ -117,16 +130,14 @@
 
             if (container.querySelector('a[href*="/ads/about"]') ||
                 container.querySelector('[aria-label="Sponsored"]')) {
-                container.dataset.adHidden = 'true';
-                container.remove();
+                hideReel(container);
                 return;
             }
 
             const spans = container.querySelectorAll('span');
             for (const span of spans) {
                 if (containsSponsoredText(span.textContent)) {
-                    container.dataset.adHidden = 'true';
-                    container.remove();
+                    hideReel(container);
                     return;
                 }
             }
@@ -154,20 +165,52 @@
 
     reelObserver.observe(document.body, { childList: true, subtree: true });
 
-    // Catch-all: remove empty slots (unfilled ad placeholders) and all-hidden-children shells.
+    // The reel on screen: the one whose top is closest to the top of the list.
+    function reelOnScreen(list) {
+        const top = list.getBoundingClientRect().top;
+        let best = null, bestDist = Infinity;
+        for (const el of list.children) {
+            if (!el.classList.contains('vertically-snappable')) continue;
+            const d = Math.abs(el.getBoundingClientRect().top - top);
+            if (d < bestDist) { bestDist = d; best = el; }
+        }
+        return bestDist < 40 ? best : null;   // null while a swipe is still moving
+    }
+
+    // A slot Facebook leaves empty (an unfilled ad) or one marked as an ad is skipped in the
+    // direction the user is going. A slot only counts as empty after ~2s on screen, since
+    // Facebook fills reels right as they come up.
+    let lastReel = null, lastIndex = -1, goingBack = false, emptySince = 0;
     setInterval(() => {
-        document.querySelectorAll('div.vertically-snappable').forEach(s => {
-            if (s.dataset.adHidden) return;
-            const kids = Array.from(s.children);
-            const isEmpty = s.innerHTML.length === 0;
-            const allHidden = kids.length > 0 && kids.every(c => getComputedStyle(c).display === 'none');
-            // Also catch leftover "Ad Blocked" divs from previous code versions
-            const isOldAdBlock = kids.length === 1 && kids[0].style && kids[0].style.background &&
-                kids[0].style.background.includes('rgb(26, 26, 26)');
-            if (isEmpty || allHidden || isOldAdBlock) {
-                s.dataset.adHidden = '1';
-                s.remove();
-            }
-        });
-    }, 800);
+        const list = document.querySelector('.vscroller-snap');
+        const reel = list && reelOnScreen(list);
+        if (!reel) return;
+        const index = Array.prototype.indexOf.call(list.children, reel);
+        if (reel !== lastReel) {
+            if (lastReel && lastReel.isConnected) goingBack = index < lastIndex;
+            lastReel = reel;
+            emptySince = 0;
+        }
+        lastIndex = index;
+
+        let skip = !!reel.dataset.adHidden;
+        if (!skip && (reel.innerHTML.length === 0 || !reel.querySelector('video, img'))) {
+            if (!emptySince) emptySince = Date.now();
+            skip = Date.now() - emptySince > 2000;
+        } else if (!skip) {
+            emptySince = 0;
+        }
+        if (!skip) return;
+
+        // Only to another reel that is not an ad; the list also holds hidden helper elements.
+        // The last slot is Facebook's own "loading more" spinner, so with nothing after it, wait.
+        const find = (back) => {
+            let el = reel;
+            do el = back ? el.previousElementSibling : el.nextElementSibling;
+            while (el && (!el.classList.contains('vertically-snappable') || el.dataset.adHidden));
+            return el;
+        };
+        const next = find(goingBack) || (goingBack ? find(false) : null);
+        if (next) next.scrollIntoView({ block: 'start' });
+    }, 300);
 })();
