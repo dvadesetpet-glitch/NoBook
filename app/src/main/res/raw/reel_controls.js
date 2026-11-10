@@ -14,7 +14,10 @@
             const h = Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0);
             const area = (w > 0 && h > 0) ? w * h : 0;
             // Require video to cover ≥60% of viewport — filters out feed post videos.
-            if (area / vp < 0.6) return;
+            // In landscape a reel is scaled to the screen height (see fitLandscape), so
+            // there it only has to fill most of the height.
+            const landscape = window.innerWidth > window.innerHeight;
+            if (landscape ? h < window.innerHeight * 0.6 : area / vp < 0.6) return;
             if (area > bestScore) { bestScore = area; best = v; }
         });
         return best;
@@ -119,6 +122,12 @@
 
         if (!v || dragging) return;
 
+        // Span the reel itself, which in landscape is narrower than the screen.
+        const vr = v.getBoundingClientRect();
+        const landscape = window.innerWidth > window.innerHeight;
+        ui.bar.style.left = (landscape ? Math.max(0, vr.left) + 8 : 8) + 'px';
+        ui.bar.style.right = (landscape ? Math.max(0, window.innerWidth - vr.right) + 8 : 8) + 'px';
+
         const d = v.duration || 0;
         const pct = d ? ((v.currentTime / d) * 100).toFixed(2) + '%' : '0%';
         ui.barFill.style.width = pct;
@@ -162,6 +171,39 @@
         if (!onReelsPage() || Date.now() - resizedAt < 2500) return;
         shownId = reelIdOnScreen() || shownId;
     }, 300);
+
+    // Landscape: Facebook always lays the reels page out as a tall portrait screen, so most of
+    // the reel is cut off. Scale that screen down so its height matches the screen height (the
+    // phone's width) and centre it, keeping the reel's proportions. Undone in portrait.
+    const fitLandscape = () => {
+        const list = document.querySelector(LIST);
+        const root = list && list.closest('body > div > div');
+        if (!root) return;
+        const backdrop = root.parentElement;
+        const want = onReelsPage() && window.innerWidth > window.innerHeight;
+        if (!want) {
+            if (root.dataset.nbFit) {
+                root.style.transform = '';
+                root.style.transformOrigin = '';
+                backdrop.style.background = '';
+                delete root.dataset.nbFit;
+            }
+            return;
+        }
+        const w = root.offsetWidth, h = root.offsetHeight;   // untransformed size
+        if (!w || !h) return;
+        const s = Math.min(1, window.innerHeight / h);
+        const x = Math.max(0, (window.innerWidth - w * s) / 2);
+        const t = `translateX(${x.toFixed(1)}px) scale(${s.toFixed(4)})`;
+        if (root.style.transform !== t) {
+            root.style.transformOrigin = '0 0';
+            root.style.transform = t;
+            backdrop.style.background = '#000';
+            root.dataset.nbFit = '1';
+        }
+    };
+    setInterval(fitLandscape, 250);
+    window.addEventListener('resize', fitLandscape);
 
     // Facebook removes the list ~1s after the resize and builds the new one ~2-3s later, so wait
     // for the new list (up to 10s) before comparing.
