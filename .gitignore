@@ -13,3 +13,4 @@ local.properties
 /build/
 /app/build/
 *.apk
+/graphify-out/
