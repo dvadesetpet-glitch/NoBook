@@ -42,85 +42,87 @@ class SettingsViewModel(
         started = SharingStarted.Eagerly
     )
 
+    // Every setting below is read with .value (e.g. MainViewModel.loadScripts) as well as
+    // collected by the UI, so it has to follow the stored value even while nothing collects it.
     val removeAds = dataStore.removeAds.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[REMOVE_ADS] ?: true,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val enableDownloadContent = dataStore.enableDownloadContent.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[ENABLE_DOWNLOAD_CONTENT] ?: true,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val enableCopyToClipboard = dataStore.enableCopyToClipboard.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[ENABLE_COPY_TO_CLIPBOARD] ?: false,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val reelAutoplay = dataStore.reelAutoplay.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[REEL_AUTOPLAY] ?: true,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val storyAutoplay = dataStore.storyAutoplay.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[STORY_AUTOPLAY] ?: true,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val desktopLayout = dataStore.desktopLayout.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[DESKTOP_LAYOUT] ?: false,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val immersiveMode = dataStore.immersiveMode.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[IMMERSIVE_MODE] ?: false,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val stickyNavbar = dataStore.stickyNavbar.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[STICKY_NAVBAR] ?: false,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val pinchToZoom = dataStore.pinchToZoom.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[PINCH_TO_ZOOM] ?: false,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val amoledBlack = dataStore.amoledBlack.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[AMOLED_BLACK] ?: false,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val hideSuggested = dataStore.hideSuggested.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[HIDE_SUGGESTED] ?: false,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val hideReels = dataStore.hideReels.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[HIDE_REELS] ?: false,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val hideStories = dataStore.hideStories.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[HIDE_STORIES] ?: false,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val hidePeopleYouMayKnow = dataStore.hidePeopleYouMayKnow.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[HIDE_PEOPLE_YOU_MAY_KNOW] ?: false,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val hideGroups = dataStore.hideGroups.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[HIDE_GROUPS] ?: false,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
     val isRevertDesktop = dataStore.revertDesktop.stateIn(
         scope = viewModelScope,
         initialValue = false,
-        started = SharingStarted.WhileSubscribed()
+        started = SharingStarted.Eagerly
     )
 
     fun setRemoveAds(removeAds: Boolean) {

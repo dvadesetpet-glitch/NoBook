@@ -202,6 +202,13 @@
             root.dataset.nbFit = '1';
         }
     };
+    // True when Facebook drew the reels page for the wide screen instead of as a portrait screen.
+    const laidOutLandscape = () => {
+        const list = document.querySelector(LIST);
+        const root = list && list.closest('body > div > div');
+        return !!root && window.innerWidth > window.innerHeight && root.offsetWidth > root.offsetHeight;
+    };
+
     setInterval(fitLandscape, 250);
     window.addEventListener('resize', fitLandscape);
 
@@ -223,7 +230,17 @@
             if (settled || elapsed > 10000) {
                 clearInterval(watcher);
                 watcher = null;
-                if (now && now !== wanted && onReelsPage()) {
+                if (!onReelsPage()) return;
+                if (now && now !== wanted) {
+                    location.href = 'https://www.facebook.com/reel/' + wanted;
+                } else if (laidOutLandscape()) {
+                    // A reel opened from the feed is redrawn for the wide screen: the video
+                    // fills the width and is cut off, and fitLandscape() cannot shrink it. Loaded
+                    // anew, the page comes back in the portrait layout, which it can.
+                    let last = 0;
+                    try { last = +sessionStorage.getItem('nbFitReload') || 0; } catch (e) {}
+                    if (Date.now() - last < 15000) return;   // never loop
+                    try { sessionStorage.setItem('nbFitReload', String(Date.now())); } catch (e) {}
                     location.href = 'https://www.facebook.com/reel/' + wanted;
                 }
             }

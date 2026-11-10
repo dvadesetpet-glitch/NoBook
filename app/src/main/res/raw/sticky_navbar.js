@@ -65,7 +65,10 @@
         const scroller = document.querySelector('div[data-type="vscroller"][data-is-pull-to-refresh-allowed="true"]');
 
         const hasLogo = navbar?.querySelector('div[aria-label*="Facebook"]');
-        const hasFeed = tabbar?.querySelector('div[aria-label*="feed"]');
+        // Only a bare tab bar goes to the bottom. On some pages (Friends) Facebook puts the page
+        // title in the same block, which would then end up under the tabs.
+        const hasFeed = tabbar?.querySelector('div[aria-label*="feed"]') &&
+            tabbar.getBoundingClientRect().height <= 60;
 
         const navbarHeight = navbar ? parseFloat(getComputedStyle(navbar).height) || parseFloat(navbar.style.height) || 0 : 0;
         const tabbarHeight = tabbar ? parseFloat(getComputedStyle(tabbar).height) || parseFloat(tabbar.style.height) || 0 : 0;
@@ -79,7 +82,14 @@
             pointerEvents: 'auto'
         });
 
+        const TABBAR_PROPS = ['position', 'bottom', 'top', 'left', 'width', 'z-index', 'pointer-events'];
+        if (tabbar && !hasFeed && tabbar.dataset.nbFixed) {
+            // The same block can grow a page title after a page change: let it go again.
+            TABBAR_PROPS.forEach((prop) => tabbar.style.removeProperty(prop));
+            delete tabbar.dataset.nbFixed;
+        }
         if (hasFeed) {
+            tabbar.dataset.nbFixed = '1';
             tabbar.style.setProperty('position', 'fixed', 'important');
             tabbar.style.setProperty('bottom', '0', 'important');
             tabbar.style.setProperty('top', 'auto', 'important');
@@ -92,14 +102,26 @@
         if (scroller) {
             const topOffset = hasLogo ? navbarHeight : 0;
             const bottomOffset = hasFeed ? tabbarHeight : 0;
-            const scrollContent = scroller.querySelector(':scope > div:not(.pull-to-refresh-spinner-container)');
+            // The navbar and tab bar sit inside the scroller too. They are fixed now, so the
+            // offset goes on the first element that is still part of the page, and an offset
+            // that an earlier pass put on the bars themselves is taken off again.
+            [navbar, tabbar].forEach((bar) => {
+                if (bar && scroller.contains(bar)) {
+                    bar.style.marginTop = '';
+                    bar.style.paddingBottom = '';
+                }
+            });
+            const scrollContent = Array.from(scroller.children).find((el) =>
+                el.tagName === 'DIV' && !el.classList.contains('pull-to-refresh-spinner-container') &&
+                el !== navbar && el !== tabbar && !el.contains(navbar) && !el.contains(tabbar));
             if (scrollContent) {
                 scrollContent.style.marginTop = topOffset + 'px';
-                scrollContent.style.paddingBottom = bottomOffset + 'px';
+                scrollContent.style.paddingBottom = '';
             } else {
                 scroller.style.paddingTop = topOffset + 'px';
-                scroller.style.paddingBottom = bottomOffset + 'px';
             }
+            // Room for the tab bar after the last post, not before the first one.
+            scroller.style.paddingBottom = bottomOffset + 'px';
 
             const spinnerContainer = scroller.querySelector('.pull-to-refresh-spinner-container');
             if (spinnerContainer) Object.assign(spinnerContainer.style, {
