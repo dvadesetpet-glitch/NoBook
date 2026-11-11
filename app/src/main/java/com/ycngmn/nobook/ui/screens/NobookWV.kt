@@ -43,6 +43,7 @@ import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewState
 import com.multiplatform.webview.web.rememberWebViewNavigator
+import com.ycngmn.nobook.BuildConfig
 import com.ycngmn.nobook.R
 import com.ycngmn.nobook.ui.components.NetworkErrorDialog
 import com.ycngmn.nobook.ui.components.settings.SettingsDialog
@@ -425,7 +426,8 @@ fun NobookWebView(
                     "AdFilteringBridge"
                 )
 
-                android.webkit.WebView.setWebContentsDebuggingEnabled(true)
+                // DevTools can read the whole Facebook session (cookies included): debug builds only.
+                android.webkit.WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
                 setLayerType(View.LAYER_TYPE_HARDWARE, null)
 
                 overScrollMode = View.OVER_SCROLL_NEVER
