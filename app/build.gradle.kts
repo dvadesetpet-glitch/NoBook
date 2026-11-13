@@ -22,8 +22,8 @@ extensions.configure<ApplicationExtension> {
         applicationId = "com.ycngmn.nobook"
         minSdk = 23
         targetSdk = 36
-        versionCode = 21
-        versionName = "1.48"
+        versionCode = 22
+        versionName = "1.49"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
