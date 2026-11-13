@@ -26,6 +26,8 @@
     <string name="enable_pure_black_theme_for_amoled_displays">Reines Schwarz aktivieren. Benötigt \'Dunkelmodus\'.</string>
     <string name="keep_the_navigation_bar_visible_while_scrolling">Navigationsleiste beim Scrollen sichtbar halten</string>
     <string name="hide_system_bars_for_a_fullscreen_experience">Systemleisten für Vollbild-Erlebnis ausblenden</string>
+    <string name="landscape_mode_title">Querformat</string>
+    <string name="landscape_mode_summary">Drehen ins Querformat erlauben. Ausschalten, um im Hochformat zu bleiben</string>
     <string name="force_desktop_layout_may_not_be_suitable_for_smaller_display">Desktop-Layout erzwingen. Nicht für kleine Displays geeignet.</string>
     <string name="use_two_fingers_to_zoom_in_or_out">Mit zwei Fingern hinein- oder herauszoomen</string>
     <string name="customize_feed">Elemente anzeigen oder ausblenden</string>

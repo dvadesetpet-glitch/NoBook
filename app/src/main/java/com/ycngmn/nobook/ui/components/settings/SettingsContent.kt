@@ -35,6 +35,7 @@ import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material.icons.outlined.SlowMotionVideo
 import androidx.compose.material.icons.outlined.Pinch
+import androidx.compose.material.icons.outlined.ScreenRotation
 import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -82,6 +83,7 @@ fun SettingsContent(
     val storyAutoplay = viewModel.storyAutoplay.collectAsState()
     val desktopLayout = viewModel.desktopLayout.collectAsState()
     val immersiveMode = viewModel.immersiveMode.collectAsState()
+    val landscapeMode = viewModel.landscapeMode.collectAsState()
     val stickyNavbar = viewModel.stickyNavbar.collectAsState()
     val pinchToZoom = viewModel.pinchToZoom.collectAsState()
     val amoledBlack = viewModel.amoledBlack.collectAsState()
@@ -193,6 +195,13 @@ fun SettingsContent(
                     onClick = { viewModel.setImmersiveMode(!immersiveMode.value) }
                 ),
                 SettingsItem(
+                    icon = Icons.Outlined.ScreenRotation,
+                    title = stringResource(R.string.landscape_mode_title),
+                    supportingText = stringResource(R.string.landscape_mode_summary),
+                    isActive = landscapeMode.value,
+                    onClick = { viewModel.setLandscapeMode(!landscapeMode.value) }
+                ),
+                SettingsItem(
                     icon = Icons.Default.Padding,
                     title = stringResource(R.string.sticky_navbar_title),
                     supportingText = stringResource(R.string.keep_the_navigation_bar_visible_while_scrolling),
@@ -225,7 +234,7 @@ fun SettingsContent(
             TextButton(
                 modifier = Modifier.align(Alignment.Center),
                 onClick = {
-                    val githubRepoUrl = "https://github.com/ycngmn/nobook"
+                    val githubRepoUrl = "https://github.com/dvadesetpet-glitch/NoBook/releases/latest"
                     val intent = Intent(Intent.ACTION_VIEW, githubRepoUrl.toUri())
                     context.startActivity(intent)
                 }

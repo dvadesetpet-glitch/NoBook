@@ -29,6 +29,8 @@
     <string name="enable_pure_black_theme_for_amoled_displays">Activar tema negro puro. Requiere \'Modo oscuro\'.</string>
     <string name="keep_the_navigation_bar_visible_while_scrolling">Mantener la barra de navegación visible al desplazarse</string>
     <string name="hide_system_bars_for_a_fullscreen_experience">Ocultar barras del sistema para experiencia de pantalla completa</string>
+    <string name="landscape_mode_title">Modo horizontal</string>
+    <string name="landscape_mode_summary">Permitir girar a horizontal. Desactívalo para permanecer en vertical</string>
     <string name="force_desktop_layout_may_not_be_suitable_for_smaller_display">Forzar diseño de escritorio. Puede no ser adecuado para pantallas pequeñas.</string>
     <string name="use_two_fingers_to_zoom_in_or_out">Usar dos dedos para acercar o alejar</string>
     <string name="customize_feed">Mostrar u ocultar elementos</string>

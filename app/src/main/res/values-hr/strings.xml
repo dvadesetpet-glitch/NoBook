@@ -33,6 +33,8 @@
     <string name="enable_pure_black_theme_for_amoled_displays">Uključi potpuno crnu temu. Potreban je \'Tamni način\'</string>
     <string name="keep_the_navigation_bar_visible_while_scrolling">Navigacijska traka ostaje vidljiva tijekom pomicanja</string>
     <string name="hide_system_bars_for_a_fullscreen_experience">Sakrij sistemske trake za prikaz preko cijelog zaslona</string>
+    <string name="landscape_mode_title">Vodoravni način</string>
+    <string name="landscape_mode_summary">Dopusti okretanje u vodoravni položaj. Isključi za stalni okomiti prikaz</string>
     <string name="force_desktop_layout_may_not_be_suitable_for_smaller_display">Prisilni raspored za računalo. Nije prikladno za male zaslone.</string>
     <string name="use_two_fingers_to_zoom_in_or_out">Zumirajte s dva prsta</string>
     <string name="customize_feed">Prikaži ili sakrij stavke</string>

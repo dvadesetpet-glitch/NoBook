@@ -26,6 +26,8 @@
     <string name="enable_pure_black_theme_for_amoled_displays">تفعيل الوضع الأسود النقي. يحتاج إلى "الوضع الداكن" للعمل</string>
     <string name="keep_the_navigation_bar_visible_while_scrolling">ابق شريط التنقل مرئياً أثناء التمرير</string>
     <string name="hide_system_bars_for_a_fullscreen_experience">إخفاء أشرطة النظام لتجربة ملء الشاشة</string>
+    <string name="landscape_mode_title">الوضع الأفقي</string>
+    <string name="landscape_mode_summary">السماح بالتدوير إلى الوضع الأفقي. أوقفه للبقاء في الوضع العمودي</string>
     <string name="force_desktop_layout_may_not_be_suitable_for_smaller_display">فرض تخطيط سطح المكتب. قد لا يكون مناسباً للشاشات الصغيرة.</string>
     <string name="use_two_fingers_to_zoom_in_or_out">استخدم إصبعين للتكبير أو التصغير</string>
     <string name="customize_feed">عرض أو إخفاء العناصر</string>

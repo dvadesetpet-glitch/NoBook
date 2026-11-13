@@ -1,6 +1,7 @@
 package com.ycngmn.nobook.ui.screens
 
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.view.View
 import android.webkit.CookieManager
 import android.widget.Toast
@@ -290,6 +291,15 @@ fun NobookWebView(
 
     LaunchedEffect(isDesktop) {
         applyUserAgent(state.lastLoadedUrl)
+    }
+
+    // "Landscape mode" setting. Off pins the screen to portrait; on goes back to following the
+    // system (the manifest sets no orientation), so the phone's own rotation lock still applies.
+    val landscapeAllowed by settingsVM.landscapeMode.collectAsState()
+    LaunchedEffect(landscapeAllowed) {
+        activity?.requestedOrientation =
+            if (landscapeAllowed) ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            else ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
     }
 
     // Back/forward do not go through the request interceptor: when the page changes to or from

@@ -146,6 +146,29 @@
     let resizedAt = 0;
 
     const onReelsPage = () => location.pathname.startsWith('/reel');
+    const onWatchPage = () => /^\/watch(\/|$)/.test(location.pathname);
+
+    // On a resize Facebook swaps /reel/<id>/ for /watch/ (a client-side route change, no reload)
+    // and shows a fresh set of reels there. That is still the reels page for our purposes, so
+    // remember that we came from a reel: true from the moment a reel is on screen until the user
+    // goes somewhere that is neither /reel nor /watch, or opens Watch by themselves (a /watch/
+    // that did not follow a resize).
+    let reelContext = false;
+    let lastResizeAt = 0;
+    let prevPath = location.pathname;
+    const trackContext = () => {
+        const path = location.pathname;
+        if (onReelsPage()) {
+            reelContext = true;
+        } else if (!onWatchPage()) {
+            reelContext = false;
+        } else if (prevPath !== path && prevPath.startsWith('/reel') && Date.now() - lastResizeAt > 6000) {
+            reelContext = false;       // moved to Watch with no rotation: the user did it
+        }
+        prevPath = path;
+    };
+    const inReels = () => onReelsPage() || (reelContext && onWatchPage());
+    window.addEventListener('resize', () => { lastResizeAt = Date.now(); });
 
     const reelIdOnScreen = () => {
         const list = document.querySelector(LIST);
@@ -167,7 +190,9 @@
     };
 
     setInterval(() => {
-        // Positions are in flux right after a resize; keep the reel from before it.
+        trackContext();
+        // Positions are in flux right after a resize; keep the reel from before it. Only a real
+        // /reel page counts here: the /watch/ list after a rotation holds different reels.
         if (!onReelsPage() || Date.now() - resizedAt < 2500) return;
         shownId = reelIdOnScreen() || shownId;
     }, 300);
@@ -216,7 +241,8 @@
     // for the new list (up to 10s) before comparing.
     let watcher = null;
     window.addEventListener('resize', () => {
-        if (!onReelsPage() || !shownId) return;
+        trackContext();
+        if (!inReels() || !shownId) return;
         resizedAt = Date.now();
         if (watcher) return;           // rotation fires several resize events
         const wanted = shownId;
@@ -230,9 +256,10 @@
             if (settled || elapsed > 10000) {
                 clearInterval(watcher);
                 watcher = null;
-                if (!onReelsPage()) return;
+                if (!inReels()) return;
                 if (now && now !== wanted) {
-                    location.href = 'https://www.facebook.com/reel/' + wanted;
+                    // Built from the current origin; the original hard-coded www.facebook.com.
+                    location.href = location.origin + '/reel/' + wanted;
                 } else if (laidOutLandscape()) {
                     // A reel opened from the feed is redrawn for the wide screen: the video
                     // fills the width and is cut off, and fitLandscape() cannot shrink it. Loaded

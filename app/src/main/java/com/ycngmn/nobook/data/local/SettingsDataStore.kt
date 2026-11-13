@@ -19,6 +19,7 @@ class SettingsDataStore(private val context: Context) {
         val STORY_AUTOPLAY = booleanPreferencesKey("story_autoplay")
         val DESKTOP_LAYOUT = booleanPreferencesKey("desktop_layout")
         val IMMERSIVE_MODE = booleanPreferencesKey("immersive_mode")
+        val LANDSCAPE_MODE = booleanPreferencesKey("landscape_mode")
         val STICKY_NAVBAR = booleanPreferencesKey("sticky_navbar")
         val PINCH_TO_ZOOM = booleanPreferencesKey("pinch_to_zoom")
         val AMOLED_BLACK = booleanPreferencesKey("amoled_black")
@@ -70,6 +71,12 @@ class SettingsDataStore(private val context: Context) {
     val immersiveMode = context.dataStore.data.map { it[IMMERSIVE_MODE] ?: false}
     suspend fun setImmersiveMode(immersiveMode: Boolean) {
         context.dataStore.edit { it[IMMERSIVE_MODE] = immersiveMode }
+    }
+
+    // On by default: the app has always followed the system rotation.
+    val landscapeMode = context.dataStore.data.map { it[LANDSCAPE_MODE] ?: true }
+    suspend fun setLandscapeMode(landscapeMode: Boolean) {
+        context.dataStore.edit { it[LANDSCAPE_MODE] = landscapeMode }
     }
 
     val stickyNavbar = context.dataStore.data.map { it[STICKY_NAVBAR] ?: true }

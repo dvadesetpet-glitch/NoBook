@@ -14,6 +14,7 @@ import com.ycngmn.nobook.data.local.SettingsDataStore.Companion.HIDE_REELS
 import com.ycngmn.nobook.data.local.SettingsDataStore.Companion.HIDE_STORIES
 import com.ycngmn.nobook.data.local.SettingsDataStore.Companion.HIDE_SUGGESTED
 import com.ycngmn.nobook.data.local.SettingsDataStore.Companion.IMMERSIVE_MODE
+import com.ycngmn.nobook.data.local.SettingsDataStore.Companion.LANDSCAPE_MODE
 import com.ycngmn.nobook.data.local.SettingsDataStore.Companion.PINCH_TO_ZOOM
 import com.ycngmn.nobook.data.local.SettingsDataStore.Companion.REEL_AUTOPLAY
 import com.ycngmn.nobook.data.local.SettingsDataStore.Companion.STORY_AUTOPLAY
@@ -77,6 +78,11 @@ class SettingsViewModel(
     val immersiveMode = dataStore.immersiveMode.stateIn(
         scope = viewModelScope,
         initialValue = initialPrefs[IMMERSIVE_MODE] ?: false,
+        started = SharingStarted.Eagerly
+    )
+    val landscapeMode = dataStore.landscapeMode.stateIn(
+        scope = viewModelScope,
+        initialValue = initialPrefs[LANDSCAPE_MODE] ?: true,
         started = SharingStarted.Eagerly
     )
     val stickyNavbar = dataStore.stickyNavbar.stateIn(
@@ -164,6 +170,12 @@ class SettingsViewModel(
     fun setImmersiveMode(immersiveMode: Boolean) {
         viewModelScope.launch {
             dataStore.setImmersiveMode(immersiveMode)
+        }
+    }
+
+    fun setLandscapeMode(landscapeMode: Boolean) {
+        viewModelScope.launch {
+            dataStore.setLandscapeMode(landscapeMode)
         }
     }
 
