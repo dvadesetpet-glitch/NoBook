@@ -47,6 +47,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import com.ycngmn.nobook.utils.UpdateResult
+import com.ycngmn.nobook.utils.checkForUpdate
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -230,22 +235,52 @@ fun SettingsContent(
             )
         )
 
-        Box(modifier = Modifier.fillMaxWidth()) {
+        val versionName = context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: ""
+        val scope = rememberCoroutineScope()
+        var checking by remember { mutableStateOf(false) }
+        var result by remember { mutableStateOf<UpdateResult?>(null) }
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             TextButton(
-                modifier = Modifier.align(Alignment.Center),
+                enabled = !checking,
                 onClick = {
-                    val githubRepoUrl = "https://github.com/dvadesetpet-glitch/NoBook/releases/latest"
-                    val intent = Intent(Intent.ACTION_VIEW, githubRepoUrl.toUri())
-                    context.startActivity(intent)
+                    val available = result as? UpdateResult.Available
+                    if (available != null) {
+                        context.startActivity(Intent(Intent.ACTION_VIEW, available.url.toUri()))
+                    } else {
+                        checking = true
+                        scope.launch {
+                            result = checkForUpdate(versionName)
+                            checking = false
+                        }
+                    }
                 }
             ) {
-                val packageName = context.packageName
-                val versionName = context.packageManager.getPackageInfo(packageName, 0).versionName
                 Text(
-                    "$packageName | v$versionName",
+                    when {
+                        checking -> "Checking..."
+                        result is UpdateResult.Available -> "Open download page"
+                        else -> "Check updates | v$versionName"
+                    },
                     modifier = Modifier.padding(4.dp),
                     maxLines = 1
                 )
+            }
+            when (val r = result) {
+                is UpdateResult.Available -> Text(
+                    "New version available: ${r.latest}",
+                    color = FacebookBlue, fontSize = 13.sp
+                )
+                is UpdateResult.UpToDate -> Text(
+                    "You have the latest version (${r.latest})", fontSize = 13.sp
+                )
+                UpdateResult.Failed -> Text(
+                    "Could not check for updates", color = MaterialTheme.colorScheme.error, fontSize = 13.sp
+                )
+                null -> {}
             }
         }
 
