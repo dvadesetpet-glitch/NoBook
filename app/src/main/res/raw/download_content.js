@@ -240,6 +240,18 @@
   // Streaming (blob:) videos are DASH: a video-only and an audio-only mp4 per clip. The player's
   // requests show up in the resource timing list; with the byte range removed each URL is the
   // whole track, and the app muxes the two into one mp4.
+  // The resource timing buffer holds only 250 entries by default; once full (after scrolling a
+  // few reels) new requests are dropped and the video's tracks can no longer be found. Raise the
+  // limit, and empty the buffer if it is ever reached anyway (the video on screen is requested
+  // after that, so its tracks are always recorded).
+  try {
+    performance.setResourceTimingBufferSize(3000);
+    performance.addEventListener("resourcetimingbufferfull", () => {
+      performance.clearResourceTimings();
+      performance.setResourceTimingBufferSize(3000);
+    });
+  } catch (e) { /* older WebView */ }
+
   let navSince = 0; // when the current viewer page was opened
   let lastPath = location.pathname + location.search;
 
