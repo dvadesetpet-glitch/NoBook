@@ -9,9 +9,22 @@
     const MOVE_TOLERANCE = 12;
     const BADGE_ID = 'nb-speed-badge';
 
+    // Reels and the Watch tab are full-screen players: the top-right part of the screen counts.
+    // Every other video (a feed video opened at /<page>/videos/<id>/, /share/v/..., a video inside
+    // a post, ...) is found by where the finger lands: on the right half of a playing video.
     const onVideoPage = () => {
         const p = location.pathname;
         return p.startsWith('/reel/') || p.startsWith('/reels/') || p === '/watch' || p === '/watch/';
+    };
+
+    const videoAt = (x, y) => {
+        let found = null;
+        document.querySelectorAll('video').forEach((v) => {
+            const r = v.getBoundingClientRect();
+            if (r.width < 120 || r.height < 120) return;
+            if (x >= r.left + r.width * 0.5 && x <= r.right && y >= r.top && y <= r.top + r.height * 0.6) found = v;
+        });
+        return found;
     };
 
     const currentVideo = () => {
@@ -60,7 +73,7 @@
     let keeper = null;
     const keep = () => {
         if (!boosted) return;
-        const v = currentVideo();
+        const v = onVideoPage() ? currentVideo() : boosted;
         if (v && v !== boosted) {
             boosted.playbackRate = 1;
             boosted = v;
@@ -87,14 +100,16 @@
 
     document.addEventListener('touchstart', (e) => {
         stop();
-        if (e.touches.length !== 1 || !onVideoPage()) return;
+        if (e.touches.length !== 1) return;
         const t = e.touches[0];
-        if (!inTopRight(t.clientX, t.clientY)) return;
+        const reelZone = onVideoPage() && inTopRight(t.clientX, t.clientY);
+        const target = reelZone ? null : videoAt(t.clientX, t.clientY);
+        if (!reelZone && !target) return;
         startX = t.clientX;
         startY = t.clientY;
         timer = setTimeout(() => {
             timer = null;
-            const v = currentVideo();
+            const v = target || currentVideo();
             if (!v) return;
             boosted = v;
             v.playbackRate = SPEED;
