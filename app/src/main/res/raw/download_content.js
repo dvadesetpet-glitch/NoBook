@@ -240,16 +240,26 @@
   // Streaming (blob:) videos are DASH: a video-only and an audio-only mp4 per clip. The player's
   // requests show up in the resource timing list; with the byte range removed each URL is the
   // whole track, and the app muxes the two into one mp4.
-  // The resource timing buffer holds only 250 entries by default; once full (after scrolling a
-  // few reels) new requests are dropped and the video's tracks can no longer be found. Raise the
-  // limit, and empty the buffer if it is ever reached anyway (the video on screen is requested
-  // after that, so its tracks are always recorded).
-  try {
-    performance.setResourceTimingBufferSize(3000);
-    performance.addEventListener("resourcetimingbufferfull", () => {
-      performance.clearResourceTimings();
-      performance.setResourceTimingBufferSize(3000);
+  // The browser's resource timing buffer holds only 250 entries and cannot drop single ones; once
+  // full (after scrolling a few reels) new requests are lost and the video's tracks can no longer
+  // be found. So keep our own list of the player's mp4 requests (newest MAX_SEEN, oldest dropped
+  // first) and empty the browser's buffer whenever it passes 100 entries.
+  const MAX_SEEN = 300;
+  const seen = [];
+  const remember = (list) => {
+    list.forEach(e => {
+      if (e.name.includes(".mp4") && e.name.includes("fbcdn")) seen.push({ name: e.name, startTime: e.startTime });
     });
+    if (seen.length > MAX_SEEN) seen.splice(0, seen.length - MAX_SEEN);
+  };
+  try {
+    performance.setResourceTimingBufferSize(250);
+    remember(performance.getEntriesByType("resource"));
+    new PerformanceObserver((l) => {
+      remember(l.getEntries());
+      if (performance.getEntriesByType("resource").length > 100) performance.clearResourceTimings();
+    }).observe({ type: "resource" });
+    performance.addEventListener("resourcetimingbufferfull", () => performance.clearResourceTimings());
   } catch (e) { /* older WebView */ }
 
   let navSince = 0; // when the current viewer page was opened
@@ -280,7 +290,7 @@
   const dashTracks = (since) => {
     const duration = playingDuration();
     const tracks = [];
-    performance.getEntriesByType("resource").forEach(e => {
+    seen.forEach(e => {
       if (e.startTime < since || !/\.mp4/.test(e.name) || !e.name.includes("fbcdn")) return;
       try {
         const u = new URL(e.name);
