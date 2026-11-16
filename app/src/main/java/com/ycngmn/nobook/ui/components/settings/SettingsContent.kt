@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -223,6 +225,7 @@ fun SettingsContent(
                         "App heap: $usedMb MB of $maxMb MB"
                     },
                     isActive = null,
+                    showArrow = false,
                     onClick = {}
                 ),
                 SettingsItem(
@@ -282,6 +285,7 @@ fun SettingsContent(
                 )
                 null -> {}
             }
+            Spacer(Modifier.height(48.dp))
         }
 
     }

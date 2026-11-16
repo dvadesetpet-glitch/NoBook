@@ -32,6 +32,7 @@ data class SettingsItem(
     val title: String,
     val supportingText: String? = null,
     val isActive: Boolean? = null,
+    val showArrow: Boolean = true, // arrow = "opens something"; off for read-only rows
     val onClick: () -> Unit,
 )
 
@@ -89,7 +90,7 @@ fun SettingsItem(
                     }
                 } else null
             )
-        } else {
+        } else if (item.showArrow) {
             Icon(
                 imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
                 contentDescription = null,
