@@ -19,6 +19,7 @@ import com.ycngmn.nobook.utils.checkForUpdate
 
 private const val PREFS = "nobook_update"
 private const val KEY_DISMISSED = "dismissed_version"
+private const val KEY_LOGO_TIP = "logo_tip_shown"
 
 /**
  * Checks GitHub for a newer release once, when the app starts, and offers it in a dialog.
@@ -34,6 +35,26 @@ fun UpdateNotice() {
         val result = checkForUpdate(BuildConfig.VERSION_NAME) as? UpdateResult.Available ?: return@LaunchedEffect
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         if (prefs.getString(KEY_DISMISSED, null) != result.latest) available = result
+    }
+
+    // One-time hint after installing a version that moved the settings from the "+" button to the logo.
+    var showTip by remember {
+        mutableStateOf(!context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getBoolean(KEY_LOGO_TIP, false))
+    }
+    if (showTip) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text("Nobook settings") },
+            text = { Text("Nobook settings are now opened by tapping the noBook logo in the top left corner.") },
+            confirmButton = {
+                TextButton(onClick = {
+                    context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+                        .edit().putBoolean(KEY_LOGO_TIP, true).apply()
+                    showTip = false
+                }) { Text("OK") }
+            },
+        )
+        return // the update dialog, if any, follows once this one is closed
     }
 
     val update = available ?: return
