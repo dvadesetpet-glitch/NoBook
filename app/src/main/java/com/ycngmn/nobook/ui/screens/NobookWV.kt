@@ -47,6 +47,7 @@ import com.multiplatform.webview.web.rememberWebViewNavigator
 import com.ycngmn.nobook.BuildConfig
 import com.ycngmn.nobook.R
 import com.ycngmn.nobook.ui.components.NetworkErrorDialog
+import com.ycngmn.nobook.ui.components.UpdateNotice
 import com.ycngmn.nobook.ui.components.settings.SettingsDialog
 import com.ycngmn.nobook.ui.viewmodel.AccountViewModel
 import com.ycngmn.nobook.ui.viewmodel.MainViewModel
@@ -475,6 +476,8 @@ fun NobookWebView(
     LaunchedEffect(settingsToggle) {
         if (settingsToggle) setWindow(false)
     }
+
+    UpdateNotice()
 
     if (settingsToggle) {
         SettingsDialog(

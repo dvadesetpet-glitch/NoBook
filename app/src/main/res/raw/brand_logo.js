@@ -32,6 +32,20 @@
             container.appendChild(text);
         }
         text.style.color = '#0866ff'; // Facebook blue in both themes
+
+        // Tapping the logo opens Nobook settings (instead of Facebook's "go home"). Capture phase,
+        // so Facebook's own handler never sees the tap. Without the bridge the tap is left alone.
+        if (!container.dataset.nbSettings) {
+            container.dataset.nbSettings = '1';
+            // Facebook marks the whole logo chain pointer-events:none (it is not a link here).
+            container.style.setProperty('pointer-events', 'auto', 'important');
+            container.addEventListener('click', (e) => {
+                if (!window.SettingsBridge?.onSettingsToggle) return;
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                window.SettingsBridge.onSettingsToggle();
+            }, true);
+        }
     };
 
     const scan = () => {

@@ -17,8 +17,7 @@
         /* Plain header icons, no grey circles (drawn by ::before). Labels end in "Facebook"
            in every language (Search Facebook / Pretraži Facebook / ...). */
         [role="button"][aria-label$="Facebook"] > div::before,
-        [role="button"][aria-label*="essenger"] > div::before,
-        #custom-settings-btn > div::before {
+        [role="button"][aria-label*="essenger"] > div::before {
             background: transparent !important;
         }
         /* Header icons at the official app's size. */
@@ -29,8 +28,6 @@
             background: transparent !important; border: 1px solid #5a5d63 !important;
             border-radius: 999px !important; box-sizing: border-box !important;
         }
-        /* Settings + button (scripts.js) at the size of the other header icons. */
-        #custom-settings-btn svg { width: 24px !important; height: 24px !important; }
         /* Facebook's own pull-to-refresh spinner; pull_to_refresh.js draws Nobook's indicator. */
         .pull-to-refresh-spinner-container { visibility: hidden !important; }
         /* Spacer injected by JS (nb-bottom-spacer) pads the feed; nothing else needs padding-bottom. */
@@ -129,19 +126,6 @@
         });
     };
 
-    const updateSettingsBtn = () => {
-        const btn = document.getElementById('custom-settings-btn');
-        if (!btn) return;
-        // scripts.js's updateButtonColor sets svg[fill] to a dark/light color, turning the
-        // entire shape solid. Re-apply our SVG whenever the fill attribute gets corrupted.
-        const svg = btn.querySelector('svg');
-        if (btn.dataset.nbPlus && svg && svg.getAttribute('fill') === 'none') return;
-        btn.dataset.nbPlus = '1';
-        const fill = (document.querySelector('meta[name="theme-color"]')?.content?.toLowerCase() === '#ffffff') ? '#242526' : '#d0d0d0';
-        btn.innerHTML = `<svg width="28" height="28" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="${fill}" stroke-width="1.8"/><path d="M12 7.5v9M7.5 12h9" stroke="${fill}" stroke-width="1.8" stroke-linecap="round"/></svg>`;
-        btn.onclick = () => window.SettingsBridge?.onSettingsToggle?.();
-    };
-
     const ensureSpacer = () => {
         const scroller = document.querySelector('div[data-type="vscroller"]');
         if (!scroller) return;
@@ -166,19 +150,10 @@
         });
     };
 
-    let timer = null;
-    const schedule = () => {
-        if (timer) return;
-        timer = setTimeout(() => { timer = null; updateSettingsBtn(); }, 200);
-    };
-
     positionNavBar();
-    updateSettingsBtn();
     ensureSpacer();
     setInterval(positionNavBar, 250);
-    setInterval(updateSettingsBtn, 1000);
     setInterval(ensureSpacer, 1000);
     markComposer();
     setInterval(markComposer, 1000);
-    new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
 })();
