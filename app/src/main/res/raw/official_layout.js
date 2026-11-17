@@ -28,6 +28,10 @@
             background: transparent !important; border: 1px solid #5a5d63 !important;
             border-radius: 999px !important; box-sizing: border-box !important;
         }
+        /* Small profile pictures never grow past their frame. Without this, the composer's avatar
+           sometimes gets the size of the whole row (a stretched, blurred picture behind the pill),
+           e.g. while a dialog is open over the page. */
+        [data-nb-avatar] > img { max-width: 100% !important; max-height: 100% !important; }
         /* Facebook's own pull-to-refresh spinner; pull_to_refresh.js draws Nobook's indicator. */
         .pull-to-refresh-spinner-container { visibility: hidden !important; }
         /* Spacer injected by JS (nb-bottom-spacer) pads the feed; nothing else needs padding-bottom. */
@@ -150,8 +154,18 @@
         });
     };
 
+    // Frames of small pictures (avatars) are marked so the CSS above can clamp their image.
+    const markAvatars = () => {
+        document.querySelectorAll('[data-mcomponent="ServerImageArea"]:not([data-nb-avatar])').forEach((el) => {
+            const r = el.getBoundingClientRect();
+            if (r.width > 0 && r.width <= 64 && r.height > 0 && r.height <= 64) el.setAttribute('data-nb-avatar', '1');
+        });
+    };
+
     positionNavBar();
     ensureSpacer();
+    markAvatars();
+    setInterval(markAvatars, 1000);
     setInterval(positionNavBar, 250);
     setInterval(ensureSpacer, 1000);
     markComposer();
