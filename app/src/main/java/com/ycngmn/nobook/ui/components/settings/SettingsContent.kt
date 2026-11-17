@@ -50,6 +50,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import com.ycngmn.nobook.utils.LinkHandler
+import com.ycngmn.nobook.utils.describe
+import com.ycngmn.nobook.utils.detectLinkHandler
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import com.ycngmn.nobook.utils.UpdateResult
@@ -82,6 +89,17 @@ fun SettingsContent(
 ) {
     val context = LocalContext.current
     var isOpenDialog by rememberSaveable { mutableStateOf(false) }
+
+    // Who opens Facebook links; checked again whenever we come back from Android's settings.
+    var linkHandler by remember { mutableStateOf<LinkHandler>(LinkHandler.Unknown) }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) linkHandler = detectLinkHandler(context)
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
 
     val removeAds = viewModel.removeAds.collectAsState()
     val enableDownloadContent = viewModel.enableDownloadContent.collectAsState()
@@ -163,10 +181,21 @@ fun SettingsContent(
                 SettingsItem(
                     icon = Icons.Outlined.Link,
                     title = "Open Facebook links in Nobook",
-                    supportingText = "Opens Android's \"Open by default\" screen: turn on \"Open supported links\"",
+                    supportingText = linkHandler.describe() + when (val handler = linkHandler) {
+                        LinkHandler.Nobook -> ""
+                        is LinkHandler.OtherApp ->
+                            "\nTap to open that app's \"Open by default\" screen and turn its links off." +
+                                "\nIf Android still gives it the links (it is verified by Facebook), disable the app: " +
+                                "Settings > Apps > ${handler.label} > Disable, or from a computer: " +
+                                "adb shell pm disable-user --user 0 ${handler.packageName}"
+                        else -> "\nTap, then turn on \"Open supported links\" and select all links"
+                    },
                     isActive = null,
                     onClick = {
-                        val details = Uri.parse("package:${context.packageName}")
+                        // Links taken by another app: that app's screen is where they are given up.
+                        val targetPackage = (linkHandler as? LinkHandler.OtherApp)?.packageName
+                            ?: context.packageName
+                        val details = Uri.parse("package:$targetPackage")
                         val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                             Intent(Settings.ACTION_APP_OPEN_BY_DEFAULT_SETTINGS, details)
                         } else {
