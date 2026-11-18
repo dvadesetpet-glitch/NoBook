@@ -73,6 +73,12 @@
         ${ACTION_ROW} > [role="button"]:not(:is(${LIKE}, [aria-label$="comment"], [aria-label$="comments"], [aria-label$="share"], [aria-label$="reacted"])) > :not(:first-child) { display: none !important; }
         ${ACTION_ROW} > [role="presentation"] { flex: 1 1 0 !important; margin: 0 !important; min-width: 0 !important; }
         ${ACTION_ROW} > [role="button"][aria-label$="reacted"] { margin: 0 0 0 auto !important; }
+        /* Comment reaction badge ("993 👍😆"): when "12 h / Like / Reply" plus the badge don't fit
+           (big system font), Facebook wraps it to a second line inside a fixed 24px row, so it
+           overlaps the "View previous replies" line. Keep it on the first line, right-aligned. */
+        [data-mcomponent="MContainer"] > [data-mcomponent="TextArea"]:first-child + [role="button"] + [role="button"] ~ [role="button"] {
+            position: absolute !important; right: 0 !important; top: 4px !important; margin: 0 !important;
+        }
     `;
     const style = document.createElement('style');
     style.textContent = css;
