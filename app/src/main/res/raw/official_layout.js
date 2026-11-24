@@ -24,13 +24,18 @@
         [role="button"][aria-label$="Facebook"] > div,
         [role="button"][aria-label$="Facebook"] > div * { font-size: 26px !important; }
         /* "What's on your mind?" as an outlined pill, like the official app. */
-        [data-nb-composer] > div[role="button"]::before {
-            background: transparent !important; border: 1px solid #5a5d63 !important;
+        [data-nb-composer]::before {
+            content: "" !important; display: block !important; position: absolute !important;
+            inset: 0 !important; border: 1px solid #5a5d63 !important;
             border-radius: 999px !important; box-sizing: border-box !important;
+            pointer-events: none !important; z-index: 1 !important;
         }
-        /* Small profile pictures never grow past their frame. Without this, the composer's avatar
-           sometimes gets the size of the whole row (a stretched, blurred picture behind the pill),
-           e.g. while a dialog is open over the page. */
+        [data-nb-composer] { position: relative !important; font-size: 15px !important; }
+        [data-nb-composer] * { font-size: 15px !important; }
+        /* Prevent the camera-button label ("Fotografija") from wrapping to two lines. */
+        [data-nb-composer] ~ * * { white-space: nowrap !important; overflow: hidden !important; }
+        /* Avatars (post headers, composer) never grow past their frame. Story ring avatars are
+           excluded in JS (they sit inside a role=button and need no clamping). */
         [data-nb-avatar] > img { max-width: 100% !important; max-height: 100% !important; }
         /* Facebook's own pull-to-refresh spinner; pull_to_refresh.js draws Nobook's indicator. */
         .pull-to-refresh-spinner-container { visibility: hidden !important; }
@@ -150,19 +155,61 @@
     // The status composer: wide button near the top of the feed whose first child is the
     // pill (a role=button). Its aria-label is localized, so find it by shape.
     const markComposer = () => {
-        document.querySelectorAll('[role="button"][data-type="container"]:not([data-nb-composer])').forEach((el) => {
-            const pill = el.firstElementChild;
-            if (!pill || pill.getAttribute('role') !== 'button') return;
+        const vw = window.innerWidth;
+        const allBtns = document.querySelectorAll('[role="button"]:not([data-nb-composer])');
+        allBtns.forEach((el) => {
             const r = el.getBoundingClientRect();
-            if (r.width > 180 && r.width < 320 && r.height > 28 && r.height < 48 && r.top < 160 && r.top > 0) {
-                el.setAttribute('data-nb-composer', '1');
-            }
+            if (r.width < vw * 0.4 || r.width > vw * 0.95) return;
+            if (r.height < 10 || r.height > 60) return;
+            if (r.top < 0 || r.top > 300) return;
+            el.setAttribute('data-nb-composer', '1');
+            if (el.parentElement) el.parentElement.setAttribute('data-nb-composer-row', '1');
         });
+        // Re-apply font-size every tick in case React re-renders and resets inline styles.
+        const composerEl = document.querySelector('[data-nb-composer]');
+        if (composerEl) {
+            composerEl.style.setProperty('font-size', '15px', 'important');
+            composerEl.querySelectorAll('*').forEach(n => n.style.setProperty('font-size', '15px', 'important'));
+        }
+        // Prevent camera-button label from wrapping (run once; guard prevents wrong ancestor on re-tick).
+        if (composerEl && !document.querySelector('[data-nb-cam-fixed]')) {
+            const pillH = composerEl.getBoundingClientRect().height;
+            const pillLeft = composerEl.getBoundingClientRect().left;
+            let rowEl = composerEl.parentElement;
+            while (rowEl && rowEl !== document.body) {
+                const kids = Array.from(rowEl.children);
+                if (kids.length >= 2 && rowEl.getBoundingClientRect().height > pillH + 5) {
+                    rowEl.setAttribute('data-nb-cam-fixed', '1');
+                    kids.forEach(kid => {
+                        if (kid !== composerEl && !kid.contains(composerEl)) {
+                            const kidLeft = kid.getBoundingClientRect().left;
+                            kid.querySelectorAll('*').forEach(n => {
+                                n.style.setProperty('white-space', 'nowrap', 'important');
+                                n.style.setProperty('overflow', 'hidden', 'important');
+                                // Hide UI text labels (uppercase start, 3+ letters only) on the camera button side.
+                                // Icon font glyphs are typically lowercase/special ("photo_camera", single char) so they won't match.
+                                if (kidLeft > pillLeft && n.children.length === 0) {
+                                    const t = n.textContent.trim();
+                                    if (t.length >= 3 && /^[A-ZČĆŠĐŽÀ-ž]/.test(t) && /^[\p{L}\p{M}]+$/u.test(t)) {
+                                        n.style.setProperty('display', 'none', 'important');
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    break;
+                }
+                rowEl = rowEl.parentElement;
+            }
+        }
     };
 
-    // Frames of small pictures (avatars) are marked so the CSS above can clamp their image.
+    // Post-header and composer avatars need max-width/height to stay inside their frame.
+    // Story ring avatars are inside tall role=button elements (≥100px); skip only those.
     const markAvatars = () => {
         document.querySelectorAll('[data-mcomponent="ServerImageArea"]:not([data-nb-avatar])').forEach((el) => {
+            const btn = el.closest('[role="button"]');
+            if (btn && btn.getBoundingClientRect().height >= 100) return;
             const r = el.getBoundingClientRect();
             if (r.width > 0 && r.width <= 64 && r.height > 0 && r.height <= 64) el.setAttribute('data-nb-avatar', '1');
         });
