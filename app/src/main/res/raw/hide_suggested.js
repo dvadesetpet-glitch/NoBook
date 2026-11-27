@@ -17,16 +17,7 @@
           });
         };
 
-        hideMatchingContainers();
-
-        const observer = new MutationObserver(() => {
-          hideMatchingContainers();
-        });
-
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true,
-        });
+        window.__nb.onScan(hideMatchingContainers);
       })();
     } else {
       (function() {
@@ -52,20 +43,8 @@
           });
         }
 
-        const observer = new MutationObserver(mutations => {
-          for (const mutation of mutations) {
-            for (const node of mutation.addedNodes) {
-              processNode(node);
-            }
-          }
-        });
-
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true
-        });
-
         processNode(document.body);
+        window.__nb.onAdd(nodes => { for (const node of nodes) processNode(node); });
       })();
     }
 })();

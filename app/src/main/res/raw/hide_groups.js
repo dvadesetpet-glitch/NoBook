@@ -8,8 +8,7 @@
     }
   };
 
-  hideLastGroupSuggestion();
-  new MutationObserver(hideLastGroupSuggestion).observe(document.body, { childList: true, subtree: true });
+  window.__nb.onScan(hideLastGroupSuggestion);
 })();
 
 // Hide on comments
@@ -24,11 +23,6 @@
     }
   };
 
-  hideGroupContainer();
-
-  new MutationObserver(hideGroupContainer).observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+  window.__nb.onScan(hideGroupContainer);
 })();
 

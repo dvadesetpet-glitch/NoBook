@@ -9,16 +9,7 @@
     if (suggCont) suggCont.style.display = 'none';
   };
 
-  hidePymk();
-
-  const obs = new MutationObserver(() => {
-    hidePymk();
-  });
-
-  obs.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
+  window.__nb.onScan(hidePymk);
 })();
 
 
@@ -34,8 +25,5 @@
   };
 
   hidePymk([document.body]);
-
-  new MutationObserver(muts =>
-    muts.forEach(m => hidePymk([...m.addedNodes]))
-  ).observe(document.body, { childList: true, subtree: true });
+  window.__nb.onAdd(nodes => hidePymk(nodes));
 })();

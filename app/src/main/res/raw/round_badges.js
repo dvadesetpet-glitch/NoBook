@@ -18,12 +18,5 @@
         });
     };
 
-    let timer = null;
-    const schedule = () => {
-        if (timer) return;
-        timer = setTimeout(() => { timer = null; scan(); }, 300);
-    };
-
-    scan();
-    new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
+    window.__nb.onScan(scan);
 })();

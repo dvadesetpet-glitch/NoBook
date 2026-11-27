@@ -15,9 +15,7 @@
 
     document.querySelectorAll(CONTAINER).forEach(handle);
 
-    new MutationObserver(muts => {
-      muts.forEach(m => m.addedNodes.forEach(handle));
-    }).observe(document.body, { childList: true, subtree: true });
+    window.__nb.onAdd(nodes => nodes.forEach(handle));
 
   } else {
     const ICON = '󰣝';
@@ -39,8 +37,6 @@
 
     document.querySelectorAll('.fl.ac .native-text').forEach(handle);
 
-    new MutationObserver(muts => {
-      muts.forEach(m => m.addedNodes.forEach(handle));
-    }).observe(document.body, { childList: true, subtree: true });
+    window.__nb.onAdd(nodes => nodes.forEach(handle));
   }
 })();

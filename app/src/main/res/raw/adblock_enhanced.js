@@ -54,17 +54,5 @@
         }
     }
 
-    // Debounce: one sweep per animation frame, however many mutations fire.
-    let scheduled = false;
-    function schedule() {
-        if (scheduled) return;
-        scheduled = true;
-        requestAnimationFrame(() => {
-            scheduled = false;
-            sweep();
-        });
-    }
-
-    sweep();
-    new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true });
+    window.__nb.onScan(sweep);
 })();

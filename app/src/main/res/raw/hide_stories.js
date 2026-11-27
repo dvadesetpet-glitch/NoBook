@@ -7,14 +7,5 @@
     if (storyContainer) storyContainer.style.display = 'none';
   };
 
-  hideTargetElement();
-
-  const observer = new MutationObserver(() => {
-    hideTargetElement();
-  });
-
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
+  window.__nb.onScan(hideTargetElement);
 })();

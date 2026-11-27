@@ -27,6 +27,31 @@
     }
     window.MutationObserver = DebouncedMO;
 
+    // Central hub: one NativeMO shared by all feature scripts that only need childList+subtree.
+    // onScan(fn) — calls fn() once now then after each batch; for "re-scan everything" scripts.
+    // onAdd(fn)  — calls fn(addedNodes[]) after each batch that added nodes.
+    const _nbScan = [], _nbAdd = [];
+    let _nbRaf = false, _nbNodes = [];
+    new NativeMO((records) => {
+        for (let i = 0; i < records.length; i++) {
+            const added = records[i].addedNodes;
+            for (let j = 0; j < added.length; j++) _nbNodes.push(added[j]);
+        }
+        if (_nbRaf) return;
+        _nbRaf = true;
+        requestAnimationFrame(() => {
+            _nbRaf = false;
+            const nodes = _nbNodes;
+            _nbNodes = [];
+            for (let i = 0; i < _nbScan.length; i++) _nbScan[i]();
+            if (nodes.length) for (let i = 0; i < _nbAdd.length; i++) _nbAdd[i](nodes);
+        });
+    }).observe(document.body, { childList: true, subtree: true });
+    window.__nb = {
+        onScan: fn => { _nbScan.push(fn); fn(); },
+        onAdd: fn => _nbAdd.push(fn)
+    };
+
     const style = document.createElement('style');
     style.textContent =
         // Action sheet menu items sometimes have a fixed height too short for two-line labels.

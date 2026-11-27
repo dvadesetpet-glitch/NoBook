@@ -10,21 +10,12 @@
 
           removeSponsored();
 
-          const observer = new MutationObserver(mutations => {
-            for (const mutation of mutations) {
-              for (const node of mutation.addedNodes) {
-                if (!(node instanceof HTMLElement)) continue;
-                if (node.matches(selector)) {
-                  node.remove();
-                } else {
-                  removeSponsored(node);
-                }
-              }
+          window.__nb.onAdd(nodes => {
+            for (const node of nodes) {
+              if (!(node instanceof HTMLElement)) continue;
+              if (node.matches(selector)) node.remove();
+              else removeSponsored(node);
             }
-          });
-          observer.observe(document.body, {
-            childList: true,
-            subtree: true
           });
         })();
 
@@ -106,10 +97,7 @@
 
     function hideAllAds() { configs.forEach(hideSponsoredContent); }
 
-    hideAllAds();
-
-    const observer = new MutationObserver(hideAllAds);
-    observer.observe(document.body, { childList: true, subtree: true });
+    window.__nb.onScan(hideAllAds);
 
     function containsSponsoredText(text) {
         const lowerText = text.toLowerCase();
@@ -147,23 +135,16 @@
     // Initial cleanup
     removeReelAds();
 
-    // Watch for dynamically added reel ads
-    const reelObserver = new MutationObserver(mutations => {
-        for (const mutation of mutations) {
-            for (const node of mutation.addedNodes) {
-                if (!(node instanceof HTMLElement)) continue;
-
-                // Check if the added node is a vertically-snappable container or contains one
-                if (node.matches('div.vertically-snappable')) {
-                    removeReelAds(node.parentElement || document);
-                } else if (node.querySelector('div.vertically-snappable')) {
-                    removeReelAds(node);
-                }
+    window.__nb.onAdd(nodes => {
+        for (const node of nodes) {
+            if (!(node instanceof HTMLElement)) continue;
+            if (node.matches('div.vertically-snappable')) {
+                removeReelAds(node.parentElement || document);
+            } else if (node.querySelector('div.vertically-snappable')) {
+                removeReelAds(node);
             }
         }
     });
-
-    reelObserver.observe(document.body, { childList: true, subtree: true });
 
     // The reel on screen: the one whose top is closest to the top of the list.
     function reelOnScreen(list) {
