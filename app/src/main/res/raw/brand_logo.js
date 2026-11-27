@@ -25,7 +25,7 @@
             text.className = MARK;
             text.textContent = TEXT;
             text.setAttribute('style', [
-                'position:absolute', 'left:0', 'top:0', 'height:100%', 'display:flex', 'align-items:center',
+                'position:absolute', 'left:4px', 'top:0', 'height:100%', 'display:flex', 'align-items:center',
                 'font:800 italic 28px/1 "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
                 'letter-spacing:-0.5px', 'white-space:nowrap', 'pointer-events:none'
             ].join(';'));
