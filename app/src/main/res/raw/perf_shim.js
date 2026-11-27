@@ -27,8 +27,4 @@
     }
     window.MutationObserver = DebouncedMO;
 
-    // Fix 1.4: skip layout and paint of off-screen feed posts. Keeps React's DOM intact.
-    const style = document.createElement('style');
-    style.textContent = 'div[role="article"] { content-visibility: auto; contain-intrinsic-size: auto 500px; }';
-    (document.head || document.documentElement).appendChild(style);
 })();
