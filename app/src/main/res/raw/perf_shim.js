@@ -27,4 +27,8 @@
     }
     window.MutationObserver = DebouncedMO;
 
+    // Action sheet menu items sometimes have a fixed height too short for two-line labels.
+    const style = document.createElement('style');
+    style.textContent = '[role="menuitem"]{height:auto!important;min-height:48px}';
+    (document.head || document.documentElement).appendChild(style);
 })();
