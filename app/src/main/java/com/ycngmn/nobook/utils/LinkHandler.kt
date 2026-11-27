@@ -8,6 +8,7 @@ import android.content.pm.verify.domain.DomainVerificationManager
 import android.content.pm.verify.domain.DomainVerificationUserState
 import android.net.Uri
 import android.os.Build
+import androidx.annotation.RequiresApi
 
 /** Who opens a Facebook link when it is tapped outside Nobook. */
 sealed interface LinkHandler {
@@ -50,6 +51,7 @@ private fun defaultBrowserLabel(context: Context): String {
  * Whether [packageName] gets [PROBE_HOST] links: 2 = verified by the site, 1 = enabled by the user,
  * 0 = neither, -1 = the app's "Open supported links" switch is off, null = not installed / unknown.
  */
+@RequiresApi(Build.VERSION_CODES.S)
 private fun domainState(context: Context, packageName: String): Int? {
     val manager = context.getSystemService(DomainVerificationManager::class.java) ?: return null
     // A disabled app is never offered a link, even though Android keeps its old verified state.
