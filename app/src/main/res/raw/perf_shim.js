@@ -27,8 +27,11 @@
     }
     window.MutationObserver = DebouncedMO;
 
-    // Action sheet menu items sometimes have a fixed height too short for two-line labels.
     const style = document.createElement('style');
-    style.textContent = '[role="menuitem"]{height:auto!important;min-height:48px}';
+    style.textContent =
+        // Action sheet menu items sometimes have a fixed height too short for two-line labels.
+        '[role="menuitem"]{height:auto!important;min-height:48px}' +
+        // Text-only feed posts use an oversized bold font; normalise to standard reading size.
+        'div[data-tracking-duration-id] div[data-mcomponent="TextArea"] .native-text{font-size:15px!important;font-weight:400!important;line-height:1.34!important}';
     (document.head || document.documentElement).appendChild(style);
 })();
