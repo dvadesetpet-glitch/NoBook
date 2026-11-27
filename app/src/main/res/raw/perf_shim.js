@@ -55,6 +55,9 @@
     const style = document.createElement('style');
     style.textContent =
         // Action sheet menu items sometimes have a fixed height too short for two-line labels.
-        '[role="menuitem"]{height:auto!important;min-height:48px}';
+        '[role="menuitem"]{height:auto!important;min-height:48px}' +
+        // Text-only posts (no image) use an oversized bold font; normalise without touching layout.
+        // :not(:has(img)) ensures posts with photos keep their original font and avoid a height gap.
+        'div[data-tracking-duration-id]:not(:has(img)) div[data-mcomponent="TextArea"] .native-text{font-size:15px!important;font-weight:400!important;line-height:1.34!important}';
     (document.head || document.documentElement).appendChild(style);
 })();

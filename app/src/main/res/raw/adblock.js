@@ -65,15 +65,19 @@
         const containers = document.querySelectorAll(selector);
 
         containers.forEach(container => {
+            const snappable = container.closest('div.vertically-snappable');
+            // Structural signal: more stable than translated text.
+            if (container.querySelector('a[href*="/ads/about"]') ||
+                container.querySelector('[aria-label="Sponsored"]')) {
+                if (snappable) hideReel(snappable);
+                else container.style.display = 'none';
+                return;
+            }
             const spans = container.querySelectorAll(textSelector);
             for (const span of spans) {
                 if (sponsoredRegex.test(span.textContent)) {
-                    const snappable = container.closest('div.vertically-snappable');
-                    if (snappable) {
-                        hideReel(snappable);
-                    } else {
-                        container.style.display = 'none';
-                    }
+                    if (snappable) hideReel(snappable);
+                    else container.style.display = 'none';
                     break;
                 }
             }
